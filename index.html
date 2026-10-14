@@ -56,7 +56,22 @@ body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:Rubi
 #statsBox .sh button{padding:2px 8px;font-size:11px}
 #statsIO{display:flex;gap:8px;margin-top:8px}#statsIO button{flex:1;padding:4px 0;font-size:12px}
 #statsTbl .lvnow{margin-top:4px;color:var(--ink);font-weight:600}
+#statsTbl .sub{color:var(--muted);line-height:18px}
+#statsTbl .sub span:first-child{font-size:12px;padding-left:12px}   /* only the label is smaller: the numbers keep the same size and line up with the rows above */
 #statsTbl div{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
+#reviewBar{position:absolute;left:50%;transform:translateX(-50%);bottom:96px;display:flex;align-items:center;gap:6px;padding:6px 8px;z-index:6;max-width:calc(100vw - 20px)}
+#reviewBar[hidden]{display:none}
+#reviewBar button{padding:6px 10px;font-size:15px}
+#revInfo{min-width:84px;text-align:center;font:600 13px Rubik,system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+#movesOv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,16,.55);z-index:8;padding:16px}
+#movesOv[hidden]{display:none}
+#movesOv .card{width:min(340px,92vw);max-height:calc(100dvh - 40px);display:flex;flex-direction:column;padding:14px 16px}
+#movesOv .ih{font-family:"Permanent Marker",cursive;font-size:22px;color:var(--yellow);margin-bottom:4px}
+#movesOpen{font-size:12px;color:var(--yellow);opacity:.85;margin-bottom:6px;min-height:14px}
+#movesList{overflow-y:auto;flex:1;min-height:60px;max-height:50dvh;display:grid;grid-template-columns:2.4em 1fr 1fr;gap:2px 6px;font:500 15px Rubik,system-ui,sans-serif;font-variant-numeric:tabular-nums;align-content:start}
+#movesList .n{color:var(--muted);text-align:right}
+#movesList .last{color:var(--yellow);font-weight:700}
+#movesList .empty{grid-column:1/-1;color:var(--muted);font-size:13px}
 #statsOv,#pickOv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,16,.55);z-index:8;padding:16px}
 #statsOv[hidden],#pickOv[hidden]{display:none}
 #statsOv .card{min-width:260px;max-width:360px;padding:14px 16px}
@@ -91,7 +106,8 @@ select.hiddenSel{display:none!important}
 #toolbar{position:absolute;left:8px;right:8px;bottom:12px;margin:0 auto;width:max-content;max-width:calc(100% - 16px);display:flex;flex-wrap:wrap;justify-content:center;gap:5px;align-items:center;padding:6px 8px}
 .card{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 h1{font-family:"Permanent Marker",cursive;font-weight:400;font-size:clamp(22px,3.4vw,32px);line-height:1;margin:0 0 4px;color:var(--ink);text-shadow:2px 2px 0 var(--pink),-1px -1px 0 var(--teal)}
-#status{font-size:14px;color:var(--muted);min-height:1.2em;margin-top:6px}
+#status{font-size:14px;color:var(--muted);line-height:20px;min-height:20px;margin-top:6px}
+#status b,#status span{line-height:20px}
 #caps{margin-top:4px;font-size:15px;line-height:1.25}
 #clock{display:flex;gap:8px;margin-top:6px}
 #clock[hidden]{display:none}
@@ -111,7 +127,13 @@ button.primary{background:var(--btn);color:var(--btn-ink);border-color:transpare
 select{background:var(--panel)}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
 label.tog{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink);cursor:pointer;padding:0 4px}
+#opening{font-size:12px;color:var(--yellow);opacity:.9;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+#opening.old{opacity:.5}
+#unranked{font-size:12px;color:var(--muted);margin-top:2px}
+#unranked[hidden]{display:none}
+#opening[hidden]{display:none}
 #banner.turned{transform:translate(-50%,-50%) rotate(180deg)}
+#banner .ovBtns{margin-top:12px;flex-wrap:wrap;justify-content:center}#banner .ovBtns button{white-space:nowrap;padding:8px 12px;flex:1 1 auto}
 #banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;display:none;pointer-events:auto;padding:22px 28px}
 #banner .big{font-family:"Permanent Marker",cursive;font-size:clamp(30px,6vw,56px);line-height:1.05;color:var(--yellow);-webkit-text-stroke:2px #111;text-shadow:4px 4px 0 var(--pink);margin-bottom:14px}
 label.tilt{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);padding:0 4px}
@@ -152,6 +174,8 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
         <h1>Graffiti Chess</h1><span class="chev" aria-hidden="true">▾</span>
       </button>
       <div id="status">Loading…</div>
+      <div id="opening" hidden></div>
+      <div id="unranked" hidden></div>
       <div id="caps" aria-label="Captured pieces"></div>
       <div id="clock" hidden><span id="clkW" class="clk"><i class="dot w"></i><b>05:00</b></span><span id="clkB" class="clk"><i class="dot b"></i><b>05:00</b></span></div>
       <div id="menuPanel" class="menu" hidden>
@@ -160,6 +184,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
         <label>Mode<select id="mode">
           <option value="cpu">vs Computer</option>
           <option value="pvp">Two players</option>
+          <option value="review">Review game</option>
         </select></label>
         <label>Your colour<select id="side">
           <option value="w">White</option>
@@ -194,14 +219,21 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
         </select></label>
         <label>Pieces<select id="pieceSel"><option value="chars">Characters</option><option value="classic">Wood</option><option value="steel">Steel</option><option value="symbols">Symbols</option></select></label>
         <label>Threats<select id="threatSel"><option value="0">Off</option><option value="1">On</option></select></label>
+        <label>Opening name<select id="openSel"><option value="0">Off</option><option value="1">On</option></select></label>
         <label>Shadows<select id="shadowSel"><option value="1">On</option><option value="0">Off</option></select></label>
         <label>Language<select id="langSel">
           <option value="en">English</option><option value="it">Italiano</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option>
           <option value="pt">Português</option><option value="pl">Polski</option><option value="ru">Русский</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option>
         </select></label>
+        <button id="movesBtn">📜 Moves</button>
         <div class="row2"><button id="statsBtn">Statistics</button><button id="infoBtn">ⓘ How to play</button></div>
       </div>
     </div>
+  </div>
+  <div id="reviewBar" class="card" hidden>
+    <button id="revLoad">📂 Load</button><button id="revFirst" aria-label="first">⏮</button><button id="revPrev" aria-label="previous">◀</button>
+    <span id="revInfo"></span><button id="revNext" aria-label="next">▶</button><button id="revLast" aria-label="last">⏭</button>
+    <input type="file" id="pgnFile" accept=".pgn,text/plain,application/x-chess-pgn" hidden>
   </div>
   <div id="toolbar" class="card">
     <button id="undoBtn" title="Undo move" aria-label="Undo move">↶<span class="lbl"> Undo</span></button>
@@ -214,6 +246,9 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
     <label class="tilt" title="View tilt"><span aria-hidden="true">∠</span><input type="range" id="tilt" min="15" max="85" step="1" value="32" aria-label="View tilt"><span id="tiltVal" class="tv">32°</span></label>
   </div>
   <button id="backBtn" class="primary" hidden>▶ <span class="txt">Back to game</span></button>
+  <div id="movesOv" hidden><div class="card"><div class="ih" id="movesTitle">Moves</div><div id="movesOpen"></div><div id="movesList"></div>
+    <div class="ovBtns"><button id="pgnCopy">Copy PGN</button><button id="pgnSave">Save .pgn</button></div>
+    <div class="ovBtns"><button id="movesBack">‹ Back</button><button class="primary" id="movesClose">Close</button></div></div></div>
   <div id="statsOv" hidden><div class="card">
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
@@ -222,7 +257,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
-  <div id="banner" class="card"><div class="big" id="bannerText"></div><button class="primary" id="againBtn">Play again</button></div>
+  <div id="banner" class="card"><div class="big" id="bannerText"></div><div class="ovBtns"><button id="saveGameBtn">Save game</button><button id="revGameBtn">Review game</button><button class="primary" id="againBtn">Play again</button></div></div>
   <div id="promo" class="card" role="dialog" aria-label="Choose promotion">
     <div class="ptitle">Promote pawn to</div>
     <div class="pgrid" id="promoGrid"></div>
@@ -241,6 +276,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <script id="engine">
 /*ENGINE-START*/
 let B, TURN, CR, EP, NEXTID, H1=0, H2=0, HALF=0, HSTACK=[];
+const hkey=()=>(H1>>>0)*2097152+((H2>>>0)&2097151);   // ~53-bit position key from both hash halves
 const idx=(f,r)=>r*8+f;
 const on=(f,r)=>f>=0&&f<8&&r>=0&&r<8;
 const opp=c=>c==='w'?'b':'w';
@@ -338,7 +374,7 @@ function make(m){
   if(m.flag==='ep') capSq=m.to+(p.c==='w'?-8:8);
   const cap=B[capSq];
   const u={m,cap,capSq,cr:CR,ep:EP,promoFrom:null,h1:H1,h2:H2,half:HALF};
-  HSTACK.push(H1);
+  HSTACK.push(hkey());
   let a=H1,b=H2; const cm0=crMask();
   a^=ZC1[cm0]; b^=ZC2[cm0];
   if(EP!==null){a^=ZE1[EP&7]; b^=ZE2[EP&7];}
@@ -355,7 +391,8 @@ function make(m){
   CR={wK:CR.wK,wQ:CR.wQ,bK:CR.bK,bQ:CR.bQ};
   EP=null;
   const wasPawn=(u.promoFrom||p.t)==='p';
-  if(wasPawn&&Math.abs(m.to-m.from)===16) EP=(m.from+m.to)/2;
+  if(wasPawn&&Math.abs(m.to-m.from)===16){ const f=m.to&7, en=p.c==='w'?'b':'w';   // recorded only if an enemy pawn stands beside it (repetition rule)
+    if((f>0&&B[m.to-1]&&B[m.to-1].t==='p'&&B[m.to-1].c===en)||(f<7&&B[m.to+1]&&B[m.to+1].t==='p'&&B[m.to+1].c===en)) EP=(m.from+m.to)/2; }
   if(p.t==='k'){CR[p.c+'K']=false; CR[p.c+'Q']=false;}
   for(const s of [m.from,m.to]){ if(s===0)CR.wQ=false; if(s===7)CR.wK=false; if(s===56)CR.bQ=false; if(s===63)CR.bK=false; }
   const cm1=crMask(); a^=ZC1[cm1]; b^=ZC2[cm1];
@@ -380,7 +417,7 @@ function unmake(u){
 }
 function makeNull(){
   const u={ep:EP,h1:H1,h2:H2,half:HALF};
-  HSTACK.push(H1);
+  HSTACK.push(hkey());
   if(EP!==null){H1^=ZE1[EP&7]; H2^=ZE2[EP&7];}
   H1^=ZS1; H2^=ZS2; EP=null; HALF++; TURN=opp(TURN);
   return u;
@@ -394,13 +431,14 @@ function legalMoves(){
 /* repetition: positions with same side to move since last irreversible move */
 function repetitions(){
   let n=0; const L=HSTACK.length;
-  for(let k=L-2;k>=0&&k>=L-HALF;k-=2) if(HSTACK[k]===H1) n++;
+  const hk=hkey(); for(let k=L-2;k>=0&&k>=L-HALF;k-=2) if(HSTACK[k]===hk) n++;
   return n;
 }
 function insufficientMaterial(){
-  let minors=0;
-  for(let i=0;i<64;i++){const p=B[i]; if(!p||p.t==='k')continue; if(p.t==='n'||p.t==='b') minors++; else return false;}
-  return minors<=1;
+  let minors=0, knights=0, bsq=new Set();
+  for(let i=0;i<64;i++){const p=B[i]; if(!p||p.t==='k')continue; if(p.t==='n'){ minors++; knights++; } else if(p.t==='b'){ minors++; bsq.add(((i>>3)+(i&7))&1); } else return false;}
+  if(minors<=1) return true;
+  return knights===0&&bsq.size===1;   // only bishops, all on squares of the same colour: mate is impossible
 }
 
 /* ---- evaluation ----
@@ -489,6 +527,19 @@ function scoreMoves(mv,ttm,ply){
 function qs(alpha,beta,ply,qd){
   if((++nodes&2047)===0&&Date.now()>stopTime) stopped=true;
   if(stopped) return 0;
+  if(qd<6&&inCheck(TURN)){   // in check: standing pat is not allowed, every evasion is searched
+    const c=TURN, mv=genPseudo(c); let any=false;
+    for(const m of mv) m._s=(m.cap?VAL[m.cap]*10:0)+(m.promo?8000:0);
+    mv.sort((a,b)=>b._s-a._s);
+    for(const m of mv){
+      const u=make(m); if(inCheck(c)){unmake(u); continue;} any=true;
+      const s=-qs(-beta,-alpha,ply+1,qd+1); unmake(u);
+      if(stopped) return 0;
+      if(s>=beta) return s;
+      if(s>alpha) alpha=s;
+    }
+    return any?alpha:-MATE+ply;
+  }
   const stand=evaluate();
   if(stand>=beta) return stand;
   if(stand>alpha) alpha=stand;
@@ -591,65 +642,107 @@ function noisyRoot(depth,noise){
   }
   LAST_SCORE=bs; return best;
 }
+// opening repertoire: 'English name|Italian name|moves'. Names are 'Family: variation'; a leading * marks a gambit, used only from Hard upwards.
 const BOOK_LINES=[
-'e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5a4 g8f6 e1g1 f8e7 f1e1 b7b5 a4b3 d7d6 c2c3 e8g8',
-'e2e4 e7e5 g1f3 b8c6 f1b5 g8f6 e1g1 f6e4 d2d4 e4d6 b5c6 d7c6 d4e5 d6f5',
-'e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d3 d7d6 e1g1 e8g8',
-'e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 d2d3 f8e7 e1g1 e8g8 f1e1 d7d6',
-'e2e4 e7e5 g1f3 b8c6 d2d4 e5d4 f3d4 g8f6 d4c6 b7c6 e4e5 d8e7',
-'e2e4 e7e5 g1f3 g8f6 f3e5 d7d6 e5f3 f6e4 d2d4 d6d5 f1d3 b8c6',
-'e2e4 e7e5 b1c3 g8f6 f1c4 b8c6 d2d3 f8c5 g1f3 d7d6',
-'e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 a7a6 c1e3 e7e5 d4b3 c8e6',
-'e2e4 c7c5 g1f3 b8c6 d2d4 c5d4 f3d4 g8f6 b1c3 e7e5 d4b5 d7d6',
-'e2e4 c7c5 g1f3 e7e6 d2d4 c5d4 f3d4 a7a6 f1d3 g8f6 e1g1',
-'e2e4 c7c5 c2c3 g8f6 e4e5 f6d5 d2d4 c5d4 g1f3 b8c6',
-'e2e4 c7c5 b1c3 b8c6 g2g3 g7g6 f1g2 f8g7 d2d3 d7d6',
-'e2e4 e7e6 d2d4 d7d5 b1c3 g8f6 c1g5 f8e7 e4e5 f6d7 g5e7 d8e7',
-'e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 d8b6 a2a3',
-'e2e4 e7e6 d2d4 d7d5 b1d2 g8f6 e4e5 f6d7 f1d3 c7c5 c2c3 b8c6',
-'e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 c8f5 e4g3 f5g6 h2h4 h7h6',
-'e2e4 c7c6 d2d4 d7d5 e4e5 c8f5 g1f3 e7e6 f1e2 c6c5',
-'e2e4 d7d5 e4d5 d8d5 b1c3 d5a5 d2d4 g8f6 g1f3 c8f5',
-'e2e4 d7d6 d2d4 g8f6 b1c3 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1',
-'e2e4 g7g6 d2d4 f8g7 b1c3 d7d6 c1e3 a7a6',
-'d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 c1g5 f8e7 e2e3 e8g8 g1f3 h7h6',
-'d2d4 d7d5 c2c4 d5c4 g1f3 g8f6 e2e3 e7e6 f1c4 c7c5 e1g1 a7a6',
-'d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1c3 d5c4 a2a4 c8f5 e2e3 e7e6',
-'d2d4 d7d5 c1f4 g8f6 e2e3 e7e6 g1f3 c7c5 c2c3 b8c6',
-'d2d4 d7d5 g1f3 g8f6 c2c4 e7e6 b1c3 f8e7 c1f4 e8g8',
-'d2d4 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 g1f3 e8g8 f1e2 e7e5 e1g1 b8c6',
-'d2d4 g8f6 c2c4 e7e6 b1c3 f8b4 e2e3 e8g8 f1d3 d7d5 g1f3 c7c5',
-'d2d4 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8e7 e1g1 e8g8',
-'d2d4 g8f6 c2c4 g7g6 b1c3 d7d5 c4d5 f6d5 e2e4 d5c3 b2c3 f8g7',
-'d2d4 g8f6 c2c4 e7e6 g2g3 d7d5 f1g2 f8e7 g1f3 e8g8 e1g1 d5c4',
-'d2d4 g8f6 c2c4 c7c5 d4d5 e7e6 b1c3 e6d5 c4d5 d7d6',
-'d2d4 f7f5 g2g3 g8f6 f1g2 e7e6 g1f3 f8e7 e1g1 e8g8 c2c4 d7d6',
-'c2c4 e7e5 b1c3 g8f6 g1f3 b8c6 g2g3 d7d5 c4d5 f6d5',
-'c2c4 c7c5 g1f3 g8f6 b1c3 b8c6 g2g3 g7g6 f1g2 f8g7 e1g1 e8g8',
-'c2c4 g8f6 b1c3 e7e6 e2e4 d7d5 e4e5 d5d4',
-'g1f3 d7d5 g2g3 g8f6 f1g2 e7e6 e1g1 f8e7 d2d3 e8g8',
-'g1f3 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 d2d4 e8g8'];
+"Ruy Lopez: Closed|Spagnola: Chiusa|e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5a4 g8f6 e1g1 f8e7 f1e1 b7b5 a4b3 d7d6 c2c3 e8g8",
+"Ruy Lopez: Berlin|Spagnola: Berlinese|e2e4 e7e5 g1f3 b8c6 f1b5 g8f6 e1g1 f6e4 d2d4 e4d6 b5c6 d7c6 d4e5 d6f5 d1d8 e8d8",
+"Ruy Lopez: Exchange|Spagnola: Cambio|e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5c6 d7c6 e1g1 f7f6 d2d4 c8g4",
+"Italian Game: Giuoco Piano|Italiana: Giuoco Piano|e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d3 d7d6 e1g1 e8g8 f1e1 a7a6 c4b3 c5a7",
+"Italian Game: Two Knights, quiet|Italiana: Due Cavalli, sistema tranquillo|e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 d2d3 f8e7 e1g1 e8g8 f1e1 d7d6 c2c3 a7a6",
+"Italian Game: Two Knights, Ng5|Italiana: Due Cavalli, Cg5|e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 c6a5 c4b5 c7c6 d5c6 b7c6 b5e2 h7h6",
+"*Italian Game: Evans Gambit|Italiana: Gambetto Evans|e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 b2b4 c5b4 c2c3 b4a5 d2d4 d7d6",
+"Scotch Game|Scozzese|e2e4 e7e5 g1f3 b8c6 d2d4 e5d4 f3d4 g8f6 d4c6 b7c6 e4e5 d8e7 d1e2 f6d5 c2c4 c8a6",
+"Four Knights Game|Partita dei Quattro Cavalli|e2e4 e7e5 g1f3 b8c6 b1c3 g8f6 f1b5 f8b4 e1g1 e8g8 d2d3 d7d6",
+"Petrov Defence|Difesa Petrov|e2e4 e7e5 g1f3 g8f6 f3e5 d7d6 e5f3 f6e4 d2d4 d6d5 f1d3 b8c6 e1g1 f8e7 c2c4 c6b4",
+"Philidor Defence|Difesa Philidor|e2e4 e7e5 g1f3 d7d6 d2d4 g8f6 b1c3 b8d7 f1c4 f8e7 e1g1 e8g8",
+"Vienna Game|Partita Viennese|e2e4 e7e5 b1c3 g8f6 f1c4 b8c6 d2d3 f8c5 g1f3 d7d6 e1g1 e8g8",
+"*King's Gambit: Accepted|Gambetto di Re: Accettato|e2e4 e7e5 f2f4 e5f4 g1f3 g7g5 h2h4 g5g4 f3e5 g8f6",
+"King's Gambit: Declined|Gambetto di Re: Rifiutato|e2e4 e7e5 f2f4 f8c5 g1f3 d7d6 c2c3 g8f6 d2d4 e5d4 c3d4 c5b4",
+"Sicilian Defence: Najdorf|Difesa Siciliana: Najdorf|e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 a7a6 c1e3 e7e5 d4b3 c8e6 f2f3 f8e7",
+"Sicilian Defence: Dragon|Difesa Siciliana: Dragone|e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 g7g6 c1e3 f8g7 f2f3 e8g8 d1d2 b8c6",
+"Sicilian Defence: Scheveningen|Difesa Siciliana: Scheveningen|e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 e7e6 f1e2 f8e7 e1g1 e8g8 f2f4 b8c6",
+"Sicilian Defence: Sveshnikov|Difesa Siciliana: Sveshnikov|e2e4 c7c5 g1f3 b8c6 d2d4 c5d4 f3d4 g8f6 b1c3 e7e5 d4b5 d7d6 c1g5 a7a6 b5a3 b7b5",
+"Sicilian Defence: Accelerated Dragon|Difesa Siciliana: Dragone accelerato|e2e4 c7c5 g1f3 b8c6 d2d4 c5d4 f3d4 g7g6 b1c3 f8g7 c1e3 g8f6 f1c4 e8g8",
+"Sicilian Defence: Kan|Difesa Siciliana: Kan|e2e4 c7c5 g1f3 e7e6 d2d4 c5d4 f3d4 a7a6 f1d3 g8f6 e1g1 d8c7 d1e2 d7d6",
+"Sicilian Defence: Taimanov|Difesa Siciliana: Taimanov|e2e4 c7c5 g1f3 e7e6 d2d4 c5d4 f3d4 b8c6 b1c3 d8c7 c1e3 a7a6 f1d3 g8f6",
+"Sicilian Defence: Rossolimo|Difesa Siciliana: Rossolimo|e2e4 c7c5 g1f3 b8c6 f1b5 g7g6 e1g1 f8g7 f1e1 e7e5 b5c6 d7c6",
+"Sicilian Defence: Alapin|Difesa Siciliana: Alapin|e2e4 c7c5 c2c3 g8f6 e4e5 f6d5 d2d4 c5d4 g1f3 b8c6 c3d4 d7d6 f1c4 d5b6",
+"Sicilian Defence: Closed|Difesa Siciliana: Chiusa|e2e4 c7c5 b1c3 b8c6 g2g3 g7g6 f1g2 f8g7 d2d3 d7d6 c1e3 e7e6 d1d2 c6d4",
+"*Sicilian Defence: Smith-Morra Gambit|Difesa Siciliana: Gambetto Smith-Morra|e2e4 c7c5 d2d4 c5d4 c2c3 d4c3 b1c3 b8c6 g1f3 d7d6 f1c4 e7e6 e1g1 g8f6",
+"French Defence: Classical|Difesa Francese: Classica|e2e4 e7e6 d2d4 d7d5 b1c3 g8f6 c1g5 f8e7 e4e5 f6d7 g5e7 d8e7 f2f4 e8g8 g1f3 c7c5",
+"French Defence: Winawer|Difesa Francese: Winawer|e2e4 e7e6 d2d4 d7d5 b1c3 f8b4 e4e5 c7c5 a2a3 b4c3 b2c3 g8e7 d1g4 d8c7",
+"French Defence: Advance|Difesa Francese: Spinta|e2e4 e7e6 d2d4 d7d5 e4e5 c7c5 c2c3 b8c6 g1f3 d8b6 a2a3 c5c4 b1d2 c6a5",
+"French Defence: Tarrasch|Difesa Francese: Tarrasch|e2e4 e7e6 d2d4 d7d5 b1d2 g8f6 e4e5 f6d7 f1d3 c7c5 c2c3 b8c6 g1e2 c5d4 c3d4 f7f6",
+"Caro-Kann Defence: Classical|Difesa Caro-Kann: Classica|e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 c8f5 e4g3 f5g6 h2h4 h7h6 g1f3 b8d7 h4h5 g6h7",
+"Caro-Kann Defence: Advance|Difesa Caro-Kann: Spinta|e2e4 c7c6 d2d4 d7d5 e4e5 c8f5 g1f3 e7e6 f1e2 c6c5 c1e3 c5d4 f3d4 g8e7",
+"Caro-Kann Defence: Panov Attack|Difesa Caro-Kann: Attacco Panov|e2e4 c7c6 d2d4 d7d5 e4d5 c6d5 c2c4 g8f6 b1c3 e7e6 g1f3 f8e7 c4d5 f6d5",
+"Scandinavian Defence|Difesa Scandinava|e2e4 d7d5 e4d5 d8d5 b1c3 d5a5 d2d4 g8f6 g1f3 c8f5 f1c4 e7e6 c1d2 c7c6",
+"Alekhine Defence: Modern|Difesa Alekhine: Moderna|e2e4 g8f6 e4e5 f6d5 d2d4 d7d6 g1f3 c8g4 f1e2 e7e6 e1g1 f8e7",
+"Pirc Defence|Difesa Pirc|e2e4 d7d6 d2d4 g8f6 b1c3 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c6 a2a4 b8d7",
+"Modern Defence|Difesa Moderna|e2e4 g7g6 d2d4 f8g7 b1c3 d7d6 c1e3 a7a6 d1d2 b7b5 f2f3 b8d7",
+"Queen's Gambit Declined: Orthodox|Gambetto di Donna rifiutato: Ortodossa|d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 c1g5 f8e7 e2e3 e8g8 g1f3 h7h6 g5h4 b7b6",
+"Queen's Gambit Declined: Exchange|Gambetto di Donna rifiutato: Cambio|d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 c4d5 e6d5 c1g5 f8e7 e2e3 c7c6 f1d3 b8d7 d1c2 e8g8",
+"Queen's Gambit Declined: Bf4|Gambetto di Donna rifiutato: Variante Af4|d2d4 d7d5 g1f3 g8f6 c2c4 e7e6 b1c3 f8e7 c1f4 e8g8 e2e3 c7c5 d4c5 e7c5",
+"Queen's Gambit Accepted|Gambetto di Donna accettato|d2d4 d7d5 c2c4 d5c4 g1f3 g8f6 e2e3 e7e6 f1c4 c7c5 e1g1 a7a6 d1e2 b7b5 c4b3 c8b7",
+"Slav Defence|Difesa Slava|d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1c3 d5c4 a2a4 c8f5 e2e3 e7e6 f1c4 f8b4 e1g1 e8g8",
+"Semi-Slav Defence: Meran|Semi-Slava: Merano|d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1c3 e7e6 e2e3 b8d7 f1d3 d5c4 d3c4 b7b5 c4d3 c8b7",
+"London System|Sistema Londra|d2d4 d7d5 c1f4 g8f6 e2e3 e7e6 g1f3 c7c5 c2c3 b8c6 b1d2 f8d6 f4g3 e8g8",
+"Colle System|Sistema Colle|d2d4 d7d5 g1f3 g8f6 e2e3 e7e6 f1d3 c7c5 c2c3 b8c6 b1d2 f8d6 e1g1 e8g8",
+"Trompowsky Attack|Attacco Trompowsky|d2d4 g8f6 c1g5 f6e4 g5f4 c7c5 f2f3 d8a5 c2c3 e4f6",
+"King's Indian Defence: Classical|Difesa Est-Indiana: Classica|d2d4 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 g1f3 e8g8 f1e2 e7e5 e1g1 b8c6 d4d5 c6e7",
+"King's Indian Defence: Sämisch|Difesa Est-Indiana: Sämisch|d2d4 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 f2f3 e8g8 c1e3 e7e5 d4d5 c7c6",
+"Nimzo-Indian Defence: Rubinstein|Difesa Nimzo-Indiana: Rubinstein|d2d4 g8f6 c2c4 e7e6 b1c3 f8b4 e2e3 e8g8 f1d3 d7d5 g1f3 c7c5 e1g1 b8c6 a2a3 b4c3 b2c3",
+"Nimzo-Indian Defence: Classical|Difesa Nimzo-Indiana: Classica|d2d4 g8f6 c2c4 e7e6 b1c3 f8b4 d1c2 e8g8 a2a3 b4c3 c2c3 b7b6 c1g5 c8b7",
+"Queen's Indian Defence|Difesa Ovest-Indiana|d2d4 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8e7 e1g1 e8g8 b1c3 f6e4 d1c2 e4c3 c2c3",
+"Bogo-Indian Defence|Difesa Bogo-Indiana|d2d4 g8f6 c2c4 e7e6 g1f3 f8b4 c1d2 d8e7 g2g3 b8c6 f1g2 b4d2 b1d2 d7d6",
+"Grünfeld Defence: Exchange|Difesa Grünfeld: Cambio|d2d4 g8f6 c2c4 g7g6 b1c3 d7d5 c4d5 f6d5 e2e4 d5c3 b2c3 f8g7 f1c4 c7c5 g1e2 b8c6",
+"Catalan Opening|Apertura Catalana|d2d4 g8f6 c2c4 e7e6 g2g3 d7d5 f1g2 f8e7 g1f3 e8g8 e1g1 d5c4 d1c2 a7a6 c2c4 b7b5",
+"Benoni Defence: Modern|Difesa Benoni: Moderna|d2d4 g8f6 c2c4 c7c5 d4d5 e7e6 b1c3 e6d5 c4d5 d7d6 e2e4 g7g6 g1f3 f8g7 f1e2 e8g8",
+"*Benko Gambit|Gambetto Benko|d2d4 g8f6 c2c4 c7c5 d4d5 b7b5 c4b5 a7a6 b5a6 g7g6 b1c3 c8a6 e2e4 a6f1 e1f1 d7d6",
+"Dutch Defence: Classical|Difesa Olandese: Classica|d2d4 f7f5 g2g3 g8f6 f1g2 e7e6 g1f3 f8e7 e1g1 e8g8 c2c4 d7d6 b1c3 d8e8",
+"English Opening: Reversed Sicilian|Apertura Inglese: Siciliana rovesciata|c2c4 e7e5 b1c3 g8f6 g1f3 b8c6 g2g3 d7d5 c4d5 f6d5 f1g2 d5b6 e1g1 f8e7",
+"English Opening: Four Knights|Apertura Inglese: Quattro Cavalli|c2c4 e7e5 b1c3 g8f6 g1f3 b8c6 g2g3 f8b4 f1g2 e8g8 e1g1 e5e4 f3e1 b4c3 d2c3",
+"English Opening: Botvinnik System|Apertura Inglese: Sistema Botvinnik|c2c4 e7e5 b1c3 b8c6 g2g3 g7g6 f1g2 f8g7 e2e4 d7d6 g1e2 g8e7 e1g1 e8g8",
+"English Opening: Symmetrical|Apertura Inglese: Simmetrica|c2c4 c7c5 g1f3 g8f6 b1c3 b8c6 g2g3 g7g6 f1g2 f8g7 e1g1 e8g8",
+"English Opening: Anglo-Indian|Apertura Inglese: Anglo-Indiana|c2c4 g8f6 g1f3 e7e6 g2g3 d7d5 f1g2 f8e7 e1g1 e8g8 b2b3 c7c5",
+"English Opening: Mikenas Attack|Apertura Inglese: Attacco Mikenas|c2c4 g8f6 b1c3 e7e6 e2e4 d7d5 e4e5 d5d4 e5f6 d4c3 b2c3 d8f6",
+"Réti Opening|Apertura Réti|g1f3 d7d5 g2g3 g8f6 f1g2 e7e6 e1g1 f8e7 d2d3 e8g8 b1d2 c7c5 e2e4 b8c6",
+"King's Indian Attack|Attacco Est-Indiano|g1f3 g8f6 g2g3 d7d5 f1g2 c7c6 e1g1 c8g4 d2d3 b8d7 b1d2 e7e5 e2e4 f8c5",
+"King's Indian Defence: via 1.Nf3|Difesa Est-Indiana: con 1.Cf3|g1f3 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6 d2d4 e8g8 f1e2 e7e5 e1g1 b8c6",
+"Bird's Opening|Apertura Bird|f2f4 d7d5 g1f3 g8f6 e2e3 g7g6 f1e2 f8g7 e1g1 e8g8 d2d3 c7c5"
+];
 let BOOK=null;
+let BOOK_NAME=null;
+function openingName(key,lang){   // the most specific name shared by all repertoire lines through this position
+  if(!BOOK) buildBook(); const ids=BOOK_NAME.get(key); if(!ids||!ids.length) return null;
+  const names=ids.map(i=>BOOK_LINES[i].split('|')[lang==='it'?1:0].replace(/^\*/,''));
+  if(names.every(n=>n===names[0])) return names[0];
+  const fam=names.map(n=>n.split(': ')[0]); return fam.every(f=>f===fam[0])?fam[0]:null;
+}   // position -> indexes of the repertoire lines that pass through it (used to name the opening on screen)
 function buildBook(){
-  const sv={B,TURN,CR,EP,H1,H2,HALF,HSTACK}; BOOK=new Map();
+  const sv={B,TURN,CR,EP,H1,H2,HALF,HSTACK,NEXTID}; BOOK=new Map(); BOOK_NAME=new Map();   // the game state is saved and restored (piece ids included)
   const sqn=s=>(s.charCodeAt(0)-97)+(+s[1]-1)*8;
-  for(const L of BOOK_LINES){
+  BOOK_LINES.forEach((LN,li)=>{
+    const L=LN.split('|').pop();
     resetBoard();
     for(const mv of L.split(' ')){
       const f=sqn(mv.slice(0,2)), t=sqn(mv.slice(2,4)), key=H1+':'+H2;
       const m=legalMoves().find(x=>x.from===f&&x.to===t); if(!m) break;
       if(!BOOK.has(key)) BOOK.set(key,[]);
-      const arr=BOOK.get(key); if(!arr.some(x=>x.from===f&&x.to===t)) arr.push({from:f,to:t});
+      const arr=BOOK.get(key), ex=arr.find(x=>x.from===f&&x.to===t);
+      if(ex) ex.ng=ex.ng||!LN.startsWith('*'); else arr.push({from:f,to:t,ng:!LN.startsWith('*')});   // ng: also used by a non-gambit line
       make(m);
+      { const k2=H1+':'+H2; if(!BOOK_NAME.has(k2)) BOOK_NAME.set(k2,[]); const nl=BOOK_NAME.get(k2); if(!nl.includes(li)) nl.push(li); }
     }
-  }
-  B=sv.B; TURN=sv.TURN; CR=sv.CR; EP=sv.EP; H1=sv.H1; H2=sv.H2; HALF=sv.HALF; HSTACK=sv.HSTACK;
+  });
+  B=sv.B; TURN=sv.TURN; CR=sv.CR; EP=sv.EP; H1=sv.H1; H2=sv.H2; HALF=sv.HALF; HSTACK=sv.HSTACK; NEXTID=sv.NEXTID;
 }
-function bookMove(){
-  if(HSTACK.length>24) return null;
+function bookMove(L=4){   // graded by level: about 3 moves each below Medium, 5 up to Hard, the full lines from Hard; no gambits below Hard
+  const maxPly=L<2?6:L<3?10:24;
+  if(HSTACK.length>=maxPly) return null;
   if(!BOOK) buildBook();
   const opts=BOOK.get(H1+':'+H2); if(!opts) return null;
-  const legal=legalMoves().filter(m=>opts.some(o=>o.from===m.from&&o.to===m.to)&&!(AVOID&&AVOID.has(m.from*64+m.to)));
+  const legal=legalMoves().filter(m=>opts.some(o=>o.from===m.from&&o.to===m.to&&(L>=3||o.ng))&&!(AVOID&&AVOID.has(m.from*64+m.to)));
   return legal.length?legal[Math.floor(Math.random()*legal.length)]:null;
 }
 /* levels: 1 Easy, 2 Medium, 3 Hard, 4 Expert; fractional values (adaptive play) blend smoothly between them.
@@ -665,7 +758,9 @@ function softRoot(depth,T){
     sc.push([m,-search(depth-1,-INF,INF,1,true)]); unmake(u);
   }
   if(!sc.length) return null;
-  const top=Math.max(...sc.map(x=>x[1])); let sum=0; const w=sc.map(([m,v])=>{ const e=Math.exp((v-top)/Math.max(1,T)); sum+=e; return e; });
+  const top=Math.max(...sc.map(x=>x[1]));
+  if(top>=MATEZ){ const bm=sc.find(x=>x[1]===top); LAST_SCORE=top; return bm[0]; }   // a forced mate is never left to chance: take the quickest one
+  let sum=0; const w=sc.map(([m,v])=>{ const e=Math.exp((v-top)/Math.max(1,T)); sum+=e; return e; });
   let r=Math.random()*sum; for(let i=0;i<sc.length;i++){ r-=w[i]; if(r<=0){ LAST_SCORE=sc[i][1]; return sc[i][0]; } }
   LAST_SCORE=sc[sc.length-1][1]; return sc[sc.length-1][0];
 }
@@ -673,12 +768,12 @@ function softRoot(depth,T){
    1-2: 2-ply search, temperature LV_T1 -> LV_T2;  2-2.75: 3-ply search, LV_T2B -> LV_T3;
    2.75-4: the 3-ply player cools down while a growing share of moves (k^1.5) comes from a timed search of 0.3 s -> 4 s; level 4 is the pure 4 s search.  Each quarter step was checked to win roughly 60-75% of games against the one below.
    avoid: root moves that lost an earlier game from this position; crit: a position where the engine once blundered -> think harder */
-const LV_T1=160, LV_T2=105, LV_T2B=150, LV_T3=99, LV_MS0=300, LV_MS1=4000;
+const LV_T1=160, LV_T2=105, LV_T2B=128, LV_T3=80, LV_MS0=300, LV_MS1=4000;   // retuned after the quiescence fix made the 3-ply band stronger
 function bestMove(level,avoid,crit){
   AVOID=avoid&&avoid.length?new Set(avoid):null; LAST_SCORE=0;
   if(AVOID&&legalMoves().every(m=>AVOID.has(m.from*64+m.to))) AVOID=null;   // never avoid every legal move
   const L=Math.max(1,Math.min(4,level)); let r=null;
-  if(L>=1.5&&!crit) r=bookMove();
+  if(L>=1.5&&!crit) r=bookMove(L);
   if(!r){
     if(L<2) r=softRoot(2+(crit?1:0),LV_T1*Math.pow(LV_T2/LV_T1,L-1)*(crit?.5:1));
     else if(L<2.75) r=softRoot(3,LV_T2B*Math.pow(LV_T3/LV_T2B,(L-2)/.75)*(crit?.5:1));
@@ -712,7 +807,7 @@ Math.random=seededRandom(20261003);
 /* ---------- languages ---------- */
 const LANGS={en:'English',it:'Italiano',fr:'Français',de:'Deutsch',es:'Español',pt:'Português',pl:'Polski',ru:'Русский',tr:'Türkçe',id:'Bahasa Indonesia'};
 const I18N={
-en:{pSym:'Symbols',backMenu:'Back',grpGame:'Game',grpLook:'Appearance',infoT:"How to play",infoClose:"Close",infoL:["Tap one of your pieces, then a highlighted square to move it.", "{undo} takes back a move, {rotate} turns the board, {view} switches the view, \"360°\" lets you look around, {hint} suggests a move; the slider tilts the camera. In the top view you can zoom with two fingers or the mouse wheel.", "{mode}: {vsCpu} or {twoP} on the same device; with {autoRot} the board turns towards the player to move. {colour} chooses your side against the computer.", "{diff}: from {lv0} to {lv3}; {adaptive} adjusts to your results, and the computer remembers the mistakes that cost it a game.", "{piecesLbl}: {pChars}, or classic pieces in {pClassic} or {pSteel}. {board}: with {bc0} the board matches the pieces. {pSym}: flat tiles, always seen from above.", "{clock}: timed games for two players, with {pause}. {threats} marks your pieces that are attacked and undefended; {shadows} can be turned off on slower devices.", "{resign} and {offerDraw} end the game by agreement.", "{stats}: your results per level; {exp} / {imp} move them to another device."],exp:'Export',imp:'Import',impOk:'Data imported',impErr:'Invalid file',autoRot:'Turn board',piecesLbl:'Pieces',pChars:'Characters',pClassic:'Wood',pSteel:'Steel',adaptive:'Adaptive',resign:'Resign',offerDraw:'Offer draw',confirm:'Confirm?',resigns:c=>`${c} resigns`,drawAgreed:'Draw agreed',drawOffered:c=>`${c} offers a draw`,accept:'Accept',decline:'Decline',cpuDeclines:'The computer declines the draw',threats:'Threats',stats:'Statistics',sW:'W',sL:'L',sD:'D',reset:'Reset',frontS:'Front',topS:'Top',shadows:'Shadows',on:'On',off:'Off',pause:'Pause',paused:'Paused',resume:'Resume',clock:'Clock',clockOff:'Off',timeWins:c=>`Time's up! ${c} wins`,timeDraw:"Time's up: draw",back:'Back to game',drag:'Drag to look around',newGame:'New game',mode:'Mode',vsCpu:'vs Computer',twoP:'Two players',colour:'Your colour',white:'White',black:'Black',diff:'Difficulty',lv:['Easy','Medium','Hard','Expert'],board:'Board',
+en:{unranked:'Not counted in statistics',saveMatch:'Save game',revMode:'Review game',revLoad:'Load',revStart:'Start',revErr:'PGN not valid',revHint:'Load a game (.pgn) or review the last one',movesT:'Moves',pgnCopy:'Copy PGN',pgnSave:'Save .pgn',pgnCopied:'Copied!',noMoves:'No moves yet',plName:'Player',cpuName:'Computer',openLbl:'Opening name',pSym:'Symbols',backMenu:'Back',grpGame:'Game',grpLook:'Appearance',infoT:"How to play",infoClose:"Close",infoL:["Tap one of your pieces, then a highlighted square to move it. During the opening, 📖 shows the name of the opening being played.", "{undo} takes back a move, {rotate} turns the board, {view} switches the view, \"360°\" lets you look around, {hint} suggests a move; the slider tilts the camera. In the top view you can zoom with two fingers or the mouse wheel.", "{mode}: {vsCpu} or {twoP} on the same device; with {autoRot} the board turns towards the player to move. {colour} chooses your side against the computer. {revMode}: reviews the game just played, or loads a .pgn file, moving through it with ◀ ▶.", "{diff}: from {lv0} to {lv3}; {adaptive} adjusts to your results, and the computer remembers the mistakes that cost it a game.", "{piecesLbl}: {pChars}, or classic pieces in {pClassic} or {pSteel}. {board}: with {bc0} the board matches the pieces. {pSym}: flat tiles, always seen from above.", "{clock}: timed games for two players, with {pause}. {threats} marks your pieces that are attacked and undefended; {shadows} can be turned off on slower devices. {openLbl} shows or hides the name of the opening.", "{resign} and {offerDraw} end the game by agreement. At the end of a game you can {saveMatch} or {revMode} straight away.", "{stats}: your results per level; {exp} / {imp} move them to another device. {movesT} lists the moves and exports the game as PGN. The statistics are also split by the colour you played. Only games played straight through against the computer count: no take-backs and no change of mode, level or colour. Asking for {hint} also takes the game out of the statistics."],exp:'Export',imp:'Import',impOk:'Data imported',impErr:'Invalid file',autoRot:'Turn board',piecesLbl:'Pieces',pChars:'Characters',pClassic:'Wood',pSteel:'Steel',adaptive:'Adaptive',resign:'Resign',offerDraw:'Offer draw',confirm:'Confirm?',resigns:c=>`${c} resigns`,drawAgreed:'Draw agreed',drawOffered:c=>`${c} offers a draw`,accept:'Accept',decline:'Decline',cpuDeclines:'The computer declines the draw',threats:'Threats',stats:'Statistics',sW:'W',sL:'L',sD:'D',reset:'Reset',frontS:'Front',topS:'Top',shadows:'Shadows',on:'On',off:'Off',pause:'Pause',paused:'Paused',resume:'Resume',clock:'Clock',clockOff:'Off',timeWins:c=>`Time's up! ${c} wins`,timeDraw:"Time's up: draw",back:'Back to game',drag:'Drag to look around',newGame:'New game',mode:'Mode',vsCpu:'vs Computer',twoP:'Two players',colour:'Your colour',white:'White',black:'Black',diff:'Difficulty',lv:['Easy','Medium','Hard','Expert'],board:'Board',
  bc:['Default','Teams','Walnut','Black','Concrete','Ivory','Chalk','Neon','Subway','Tournament','Marble','Maple','Steel','Graffiti'],lang:'Language',
  undo:'Undo',rotate:'Rotate',top:'Top view',front:'Front view',hint:'Hint',sound:'Sound',tilt:'View tilt',
  yourMove:c=>`Your move (<b>${c}</b>)`,checkYour:'<b>Check!</b> Your move',thinking:c=>`<b>${c}</b> is thinking…`,toMove:c=>`<b>${c}</b> to move`,check:'Check!',
@@ -721,7 +816,7 @@ en:{pSym:'Symbols',backMenu:'Back',grpGame:'Game',grpLook:'Appearance',infoT:"Ho
  win:'You win!',lose:'You lose!',wins:c=>`${c} wins!`,again:'Play again',promo:'Promote pawn to',promoN:{q:'Queen',r:'Rook',b:'Bishop',n:'Knight'},cancel:'Cancel',
  toast:'Tap one of your pieces to see where it can go',rotateMsg:'Turn your phone upright to play',loading:'Shaking the spray cans…',
  W:{check:'CHECK!',mate:'MATE!',q:'QUEEN!',r:'ROOK!',b:'BISHOP!',n:'KNIGHT!'}},
-it:{pSym:'Simboli',backMenu:'Indietro',grpGame:'Partita',grpLook:'Aspetto',infoT:"Come si gioca",infoClose:"Chiudi",infoL:["Tocca un tuo pezzo, poi una casa evidenziata per muoverlo.", "{undo} ritira una mossa, {rotate} gira la scacchiera, {view} cambia la vista, \"360°\" ti fa guardare intorno, {hint} suggerisce una mossa; lo slider inclina la telecamera. Nella vista dall'alto puoi ingrandire con due dita o con la rotellina.", "{mode}: {vsCpu} oppure {twoP} sullo stesso dispositivo; con {autoRot} la scacchiera si gira verso chi deve muovere. {colour} sceglie la tua parte contro il computer.", "{diff}: da {lv0} a {lv3}; {adaptive} si regola sui tuoi risultati, e il computer ricorda gli errori che gli sono costati una partita.", "{piecesLbl}: {pChars}, oppure pezzi classici in {pClassic} o {pSteel}. {board}: con {bc0} la scacchiera si abbina ai pezzi. {pSym}: tessere piatte, viste sempre dall'alto.", "{clock}: partite a tempo in due, con {pause}. {threats} segnala i tuoi pezzi attaccati e non difesi; {shadows} si può spegnere sui dispositivi più lenti.", "{resign} e {offerDraw} chiudono la partita di comune accordo.", "{stats}: i tuoi risultati per livello; {exp} / {imp} li trasferisce su un altro dispositivo."],exp:'Esporta',imp:'Importa',impOk:'Dati importati',impErr:'File non valido',autoRot:'Ruota a turno',piecesLbl:'Pezzi',pChars:'Personaggi',pClassic:'Legno',pSteel:'Acciaio',adaptive:'Adattiva',resign:'Abbandona',offerDraw:'Proponi patta',confirm:'Confermi?',resigns:c=>`Il ${c} abbandona`,drawAgreed:'Patta concordata',drawOffered:c=>`Il ${c} propone patta`,accept:'Accetta',decline:'Rifiuta',cpuDeclines:'Il computer rifiuta la patta',threats:'Minacce',stats:'Statistiche',sW:'V',sL:'S',sD:'P',reset:'Azzera',frontS:'Fronte',topS:'Alto',shadows:'Ombre',on:'Sì',off:'No',pause:'Pausa',paused:'In pausa',resume:'Riprendi',clock:'Orologio',clockOff:'No',timeWins:c=>`Tempo scaduto! Vince il ${c}`,timeDraw:'Tempo scaduto: patta',back:'Torna a giocare',drag:'Trascina per guardarti intorno',newGame:'Nuova partita',mode:'Modalità',vsCpu:'Contro il PC',twoP:'In due',colour:'Il tuo colore',white:'Bianco',black:'Nero',diff:'Difficoltà',lv:['Facile','Medio','Difficile','Esperto'],board:'Scacchiera',
+it:{unranked:'Non conta per le statistiche',saveMatch:'Salva partita',revMode:'Rivedi partita',revLoad:'Carica',revStart:'Inizio',revErr:'PGN non valido',revHint:'Carica una partita (.pgn) o rivedi l\'ultima',movesT:'Mosse',pgnCopy:'Copia PGN',pgnSave:'Salva .pgn',pgnCopied:'Copiato!',noMoves:'Nessuna mossa',plName:'Giocatore',cpuName:'Computer',openLbl:'Nome apertura',pSym:'Simboli',backMenu:'Indietro',grpGame:'Partita',grpLook:'Aspetto',infoT:"Come si gioca",infoClose:"Chiudi",infoL:["Tocca un tuo pezzo, poi una casa evidenziata per muoverlo. Durante l'apertura, 📖 mostra il nome dell'apertura che si sta giocando.", "{undo} ritira una mossa, {rotate} gira la scacchiera, {view} cambia la vista, \"360°\" ti fa guardare intorno, {hint} suggerisce una mossa; lo slider inclina la telecamera. Nella vista dall'alto puoi ingrandire con due dita o con la rotellina.", "{mode}: {vsCpu} oppure {twoP} sullo stesso dispositivo; con {autoRot} la scacchiera si gira verso chi deve muovere. {colour} sceglie la tua parte contro il computer. {revMode}: rivede la partita appena giocata, oppure carica un file .pgn, scorrendo le mosse con ◀ ▶.", "{diff}: da {lv0} a {lv3}; {adaptive} si regola sui tuoi risultati, e il computer ricorda gli errori che gli sono costati una partita.", "{piecesLbl}: {pChars}, oppure pezzi classici in {pClassic} o {pSteel}. {board}: con {bc0} la scacchiera si abbina ai pezzi. {pSym}: tessere piatte, viste sempre dall'alto.", "{clock}: partite a tempo in due, con {pause}. {threats} segnala i tuoi pezzi attaccati e non difesi; {shadows} si può spegnere sui dispositivi più lenti. {openLbl} mostra o nasconde il nome dell'apertura.", "{resign} e {offerDraw} chiudono la partita di comune accordo. A fine partita puoi subito {saveMatch} o {revMode}.", "{stats}: i tuoi risultati per livello; {exp} / {imp} li trasferisce su un altro dispositivo. {movesT} elenca le mosse ed esporta la partita in PGN. Le statistiche sono divise anche per il colore giocato. Contano solo le partite giocate dall'inizio alla fine contro il computer, senza annullamenti né cambi di modalità, livello o colore. Anche chiedere {hint} esclude la partita dalle statistiche."],exp:'Esporta',imp:'Importa',impOk:'Dati importati',impErr:'File non valido',autoRot:'Ruota a turno',piecesLbl:'Pezzi',pChars:'Personaggi',pClassic:'Legno',pSteel:'Acciaio',adaptive:'Adattiva',resign:'Abbandona',offerDraw:'Proponi patta',confirm:'Confermi?',resigns:c=>`Il ${c} abbandona`,drawAgreed:'Patta concordata',drawOffered:c=>`Il ${c} propone patta`,accept:'Accetta',decline:'Rifiuta',cpuDeclines:'Il computer rifiuta la patta',threats:'Minacce',stats:'Statistiche',sW:'V',sL:'S',sD:'P',reset:'Azzera',frontS:'Fronte',topS:'Alto',shadows:'Ombre',on:'Sì',off:'No',pause:'Pausa',paused:'In pausa',resume:'Riprendi',clock:'Orologio',clockOff:'No',timeWins:c=>`Tempo scaduto! Vince il ${c}`,timeDraw:'Tempo scaduto: patta',back:'Torna a giocare',drag:'Trascina per guardarti intorno',newGame:'Nuova partita',mode:'Modalità',vsCpu:'Contro il PC',twoP:'In due',colour:'Il tuo colore',white:'Bianco',black:'Nero',diff:'Difficoltà',lv:['Facile','Medio','Difficile','Esperto'],board:'Scacchiera',
  bc:['Predefinita','Squadre','Noce','Nera','Cemento','Avorio','Gesso','Neon','Metrò','Torneo','Marmo','Acero','Acciaio','Graffiti'],lang:'Lingua',
  undo:'Annulla',rotate:'Ruota',top:"Dall'alto",front:'Frontale',hint:'Aiuto',sound:'Suoni',tilt:'Inclinazione',
  yourMove:c=>`Tocca a te (<b>${c}</b>)`,checkYour:'<b>Scacco!</b> Tocca a te',thinking:c=>`Il <b>${c}</b> sta pensando…`,toMove:c=>`Tocca al <b>${c}</b>`,check:'Scacco!',
@@ -730,7 +825,7 @@ it:{pSym:'Simboli',backMenu:'Indietro',grpGame:'Partita',grpLook:'Aspetto',infoT
  win:'Hai vinto!',lose:'Hai perso!',wins:c=>`Vince il ${c}!`,again:'Gioca ancora',promo:'Promuovi il pedone a',promoN:{q:'Regina',r:'Torre',b:'Alfiere',n:'Cavallo'},cancel:'Annulla',
  toast:'Tocca un tuo pezzo per vedere dove può andare',rotateMsg:'Gira il telefono in verticale per giocare',loading:'Preparo le bombolette…',
  W:{check:'SCACCO!',mate:'MATTO!',q:'REGINA!',r:'TORRE!',b:'ALFIERE!',n:'CAVALLO!'}},
-fr:{pSym:'Symboles',backMenu:'Retour',grpGame:'Partie',grpLook:'Apparence',infoT:"Comment jouer",infoClose:"Fermer",infoL:["Touchez une de vos pièces, puis une case en surbrillance pour la déplacer.", "{undo} reprend un coup, {rotate} retourne l'échiquier, {view} change la vue, \"360°\" permet de regarder autour, {hint} propose un coup ; le curseur incline la caméra. Dans la vue de dessus, zoomez avec deux doigts ou la molette.", "{mode} : {vsCpu} ou {twoP} sur le même appareil ; avec {autoRot}, l'échiquier se tourne vers le joueur au trait. {colour} choisit votre camp contre l'ordinateur.", "{diff} : de {lv0} à {lv3} ; {adaptive} s'ajuste à vos résultats, et l'ordinateur retient les erreurs qui lui ont coûté une partie.", "{piecesLbl} : {pChars}, ou pièces classiques en {pClassic} ou {pSteel}. {board} : avec {bc0}, l'échiquier s'accorde aux pièces. {pSym} : tuiles plates, toujours vues de dessus.", "{clock} : parties à la pendule à deux, avec {pause}. {threats} signale vos pièces attaquées et non défendues ; {shadows} peut être désactivé sur les appareils lents.", "{resign} et {offerDraw} terminent la partie d'un commun accord.", "{stats} : vos résultats par niveau ; {exp} / {imp} les transfère sur un autre appareil."],exp:'Exporter',imp:'Importer',impOk:'Données importées',impErr:'Fichier non valide',autoRot:'Tourner au tour',piecesLbl:'Pièces',pChars:'Personnages',pClassic:'Bois',pSteel:'Acier',adaptive:'Adaptatif',resign:'Abandonner',offerDraw:'Proposer nulle',confirm:'Confirmer ?',resigns:c=>`${c} : abandon`,drawAgreed:'Nulle acceptée',drawOffered:c=>`${c} : proposition de nulle`,accept:'Accepter',decline:'Refuser',cpuDeclines:'L\'ordinateur refuse la nulle',threats:'Menaces',stats:'Statistiques',sW:'V',sL:'D',sD:'N',reset:'Réinitialiser',frontS:'Face',topS:'Dessus',shadows:'Ombres',on:'Oui',off:'Non',pause:'Pause',paused:'En pause',resume:'Reprendre',clock:'Pendule',clockOff:'Non',timeWins:c=>`Temps écoulé ! Les ${c} gagnent`,timeDraw:'Temps écoulé : nulle',back:'Retour au jeu',drag:'Faites glisser pour regarder autour',newGame:'Nouvelle partie',mode:'Mode',vsCpu:'Contre le PC',twoP:'Deux joueurs',colour:'Votre couleur',white:'Blancs',black:'Noirs',diff:'Difficulté',lv:['Facile','Moyen','Difficile','Expert'],board:'Échiquier',
+fr:{unranked:'Non comptée dans les statistiques',saveMatch:'Enregistrer',revMode:'Revoir partie',revLoad:'Charger',revStart:'Début',revErr:'PGN non valide',revHint:'Chargez une partie (.pgn) ou revoyez la dernière',movesT:'Coups',pgnCopy:'Copier PGN',pgnSave:'Enregistrer .pgn',pgnCopied:'Copié !',noMoves:'Aucun coup',plName:'Joueur',cpuName:'Ordinateur',openLbl:'Ouverture',pSym:'Symboles',backMenu:'Retour',grpGame:'Partie',grpLook:'Apparence',infoT:"Comment jouer",infoClose:"Fermer",infoL:["Touchez une de vos pièces, puis une case en surbrillance pour la déplacer. Pendant l'ouverture, 📖 affiche le nom de l'ouverture jouée.", "{undo} reprend un coup, {rotate} retourne l'échiquier, {view} change la vue, \"360°\" permet de regarder autour, {hint} propose un coup ; le curseur incline la caméra. Dans la vue de dessus, zoomez avec deux doigts ou la molette.", "{mode} : {vsCpu} ou {twoP} sur le même appareil ; avec {autoRot}, l'échiquier se tourne vers le joueur au trait. {colour} choisit votre camp contre l'ordinateur. {revMode} : revoit la partie qui vient d'être jouée, ou charge un fichier .pgn, en parcourant les coups avec ◀ ▶.", "{diff} : de {lv0} à {lv3} ; {adaptive} s'ajuste à vos résultats, et l'ordinateur retient les erreurs qui lui ont coûté une partie.", "{piecesLbl} : {pChars}, ou pièces classiques en {pClassic} ou {pSteel}. {board} : avec {bc0}, l'échiquier s'accorde aux pièces. {pSym} : tuiles plates, toujours vues de dessus.", "{clock} : parties à la pendule à deux, avec {pause}. {threats} signale vos pièces attaquées et non défendues ; {shadows} peut être désactivé sur les appareils lents. {openLbl} affiche ou masque le nom de l'ouverture.", "{resign} et {offerDraw} terminent la partie d'un commun accord. En fin de partie, vous pouvez aussitôt {saveMatch} ou {revMode}.", "{stats} : vos résultats par niveau ; {exp} / {imp} les transfère sur un autre appareil. {movesT} affiche les coups et exporte la partie en PGN. Les statistiques sont aussi réparties selon la couleur jouée. Seules comptent les parties jouées d'un bout à l'autre contre l'ordinateur, sans coup repris ni changement de mode, de niveau ou de couleur. Demander {hint} exclut aussi la partie des statistiques."],exp:'Exporter',imp:'Importer',impOk:'Données importées',impErr:'Fichier non valide',autoRot:'Tourner au tour',piecesLbl:'Pièces',pChars:'Personnages',pClassic:'Bois',pSteel:'Acier',adaptive:'Adaptatif',resign:'Abandonner',offerDraw:'Proposer nulle',confirm:'Confirmer ?',resigns:c=>`${c} : abandon`,drawAgreed:'Nulle acceptée',drawOffered:c=>`${c} : proposition de nulle`,accept:'Accepter',decline:'Refuser',cpuDeclines:'L\'ordinateur refuse la nulle',threats:'Menaces',stats:'Statistiques',sW:'V',sL:'D',sD:'N',reset:'Réinitialiser',frontS:'Face',topS:'Dessus',shadows:'Ombres',on:'Oui',off:'Non',pause:'Pause',paused:'En pause',resume:'Reprendre',clock:'Pendule',clockOff:'Non',timeWins:c=>`Temps écoulé ! Les ${c} gagnent`,timeDraw:'Temps écoulé : nulle',back:'Retour au jeu',drag:'Faites glisser pour regarder autour',newGame:'Nouvelle partie',mode:'Mode',vsCpu:'Contre le PC',twoP:'Deux joueurs',colour:'Votre couleur',white:'Blancs',black:'Noirs',diff:'Difficulté',lv:['Facile','Moyen','Difficile','Expert'],board:'Échiquier',
  bc:['Par défaut','Équipes','Noyer','Noir','Béton','Ivoire','Craie','Néon','Métro','Tournoi','Marbre','Érable','Acier','Graffiti'],lang:'Langue',
  undo:'Annuler',rotate:'Pivoter',top:'Vue de dessus',front:'Vue de face',hint:'Indice',sound:'Son',tilt:'Inclinaison',
  yourMove:c=>`À vous (<b>${c}</b>)`,checkYour:'<b>Échec !</b> À vous',thinking:c=>`Les <b>${c}</b> réfléchissent…`,toMove:c=>`Trait aux <b>${c}</b>`,check:'Échec !',
@@ -739,7 +834,7 @@ fr:{pSym:'Symboles',backMenu:'Retour',grpGame:'Partie',grpLook:'Apparence',infoT
  win:'Vous avez gagné !',lose:'Vous avez perdu !',wins:c=>`Les ${c} gagnent !`,again:'Rejouer',promo:'Promouvoir le pion en',promoN:{q:'Dame',r:'Tour',b:'Fou',n:'Cavalier'},cancel:'Annuler',
  toast:'Touchez une de vos pièces pour voir où elle peut aller',rotateMsg:'Tournez votre téléphone à la verticale pour jouer',loading:'On secoue les bombes…',
  W:{check:'ÉCHEC !',mate:'MAT !',q:'DAME !',r:'TOUR !',b:'FOU !',n:'CAVALIER !'}},
-de:{pSym:'Symbole',backMenu:'Zurück',grpGame:'Partie',grpLook:'Darstellung',infoT:"Spielanleitung",infoClose:"Schließen",infoL:["Tippe auf eine deiner Figuren und dann auf ein markiertes Feld, um sie zu ziehen.", "{undo} nimmt einen Zug zurück, {rotate} wendet das Brett, {view} wechselt die Ansicht, \"360°\" zeigt die Umgebung, {hint} schlägt einen Zug vor; der Regler neigt die Kamera. In der Draufsicht zoomst du mit zwei Fingern oder dem Mausrad.", "{mode}: {vsCpu} oder {twoP} am selben Gerät; mit {autoRot} dreht sich das Brett zum Spieler am Zug. {colour} wählt deine Seite gegen den Computer.", "{diff}: von {lv0} bis {lv3}; {adaptive} passt sich deinen Ergebnissen an, und der Computer merkt sich die Fehler, die ihn eine Partie gekostet haben.", "{piecesLbl}: {pChars} oder klassische Figuren aus {pClassic} oder {pSteel}. {board}: mit {bc0} passt das Brett zu den Figuren. {pSym}: flache Spielsteine, immer von oben gesehen.", "{clock}: Partien mit Uhr zu zweit, mit {pause}. {threats} markiert deine angegriffenen, ungedeckten Figuren; {shadows} lässt sich auf langsamen Geräten abschalten.", "{resign} und {offerDraw} beenden die Partie einvernehmlich.", "{stats}: deine Ergebnisse pro Stufe; {exp} / {imp} überträgt sie auf ein anderes Gerät."],exp:'Exportieren',imp:'Importieren',impOk:'Daten importiert',impErr:'Ungültige Datei',autoRot:'Brett drehen',piecesLbl:'Figuren',pChars:'Charaktere',pClassic:'Holz',pSteel:'Stahl',adaptive:'Adaptiv',resign:'Aufgeben',offerDraw:'Remis anbieten',confirm:'Bestätigen?',resigns:c=>`${c} gibt auf`,drawAgreed:'Remis vereinbart',drawOffered:c=>`${c} bietet Remis an`,accept:'Annehmen',decline:'Ablehnen',cpuDeclines:'Der Computer lehnt das Remis ab',threats:'Bedrohungen',stats:'Statistik',sW:'S',sL:'N',sD:'R',reset:'Zurücksetzen',frontS:'Vorne',topS:'Oben',shadows:'Schatten',on:'An',off:'Aus',pause:'Pause',paused:'Pausiert',resume:'Fortsetzen',clock:'Uhr',clockOff:'Aus',timeWins:c=>`Zeit abgelaufen! ${c} gewinnt`,timeDraw:'Zeit abgelaufen: Remis',back:'Zurück zum Spiel',drag:'Ziehen, um dich umzusehen',newGame:'Neues Spiel',mode:'Modus',vsCpu:'Gegen den PC',twoP:'Zwei Spieler',colour:'Deine Farbe',white:'Weiß',black:'Schwarz',diff:'Schwierigkeit',lv:['Leicht','Mittel','Schwer','Experte'],board:'Brett',
+de:{unranked:'Zählt nicht für die Statistik',saveMatch:'Speichern',revMode:'Partie ansehen',revLoad:'Laden',revStart:'Anfang',revErr:'PGN ungültig',revHint:'Partie (.pgn) laden oder die letzte ansehen',movesT:'Züge',pgnCopy:'PGN kopieren',pgnSave:'.pgn speichern',pgnCopied:'Kopiert!',noMoves:'Noch keine Züge',plName:'Spieler',cpuName:'Computer',openLbl:'Eröffnung',pSym:'Symbole',backMenu:'Zurück',grpGame:'Partie',grpLook:'Darstellung',infoT:"Spielanleitung",infoClose:"Schließen",infoL:["Tippe auf eine deiner Figuren und dann auf ein markiertes Feld, um sie zu ziehen. In der Eröffnung zeigt 📖 den Namen der gespielten Eröffnung.", "{undo} nimmt einen Zug zurück, {rotate} wendet das Brett, {view} wechselt die Ansicht, \"360°\" zeigt die Umgebung, {hint} schlägt einen Zug vor; der Regler neigt die Kamera. In der Draufsicht zoomst du mit zwei Fingern oder dem Mausrad.", "{mode}: {vsCpu} oder {twoP} am selben Gerät; mit {autoRot} dreht sich das Brett zum Spieler am Zug. {colour} wählt deine Seite gegen den Computer. {revMode}: zeigt die eben gespielte Partie oder lädt eine .pgn-Datei; mit ◀ ▶ blätterst du durch die Züge.", "{diff}: von {lv0} bis {lv3}; {adaptive} passt sich deinen Ergebnissen an, und der Computer merkt sich die Fehler, die ihn eine Partie gekostet haben.", "{piecesLbl}: {pChars} oder klassische Figuren aus {pClassic} oder {pSteel}. {board}: mit {bc0} passt das Brett zu den Figuren. {pSym}: flache Spielsteine, immer von oben gesehen.", "{clock}: Partien mit Uhr zu zweit, mit {pause}. {threats} markiert deine angegriffenen, ungedeckten Figuren; {shadows} lässt sich auf langsamen Geräten abschalten. {openLbl} blendet den Namen der Eröffnung ein oder aus.", "{resign} und {offerDraw} beenden die Partie einvernehmlich. Am Ende einer Partie kannst du sofort {saveMatch} oder {revMode}.", "{stats}: deine Ergebnisse pro Stufe; {exp} / {imp} überträgt sie auf ein anderes Gerät. {movesT} zeigt die Züge und exportiert die Partie als PGN. Die Statistik ist auch nach der gespielten Farbe aufgeteilt. Es zählen nur Partien, die durchgehend gegen den Computer gespielt wurden, ohne Zurücknahme und ohne Wechsel von Modus, Stufe oder Farbe. Auch {hint} anzufordern nimmt die Partie aus der Statistik."],exp:'Exportieren',imp:'Importieren',impOk:'Daten importiert',impErr:'Ungültige Datei',autoRot:'Brett drehen',piecesLbl:'Figuren',pChars:'Charaktere',pClassic:'Holz',pSteel:'Stahl',adaptive:'Adaptiv',resign:'Aufgeben',offerDraw:'Remis anbieten',confirm:'Bestätigen?',resigns:c=>`${c} gibt auf`,drawAgreed:'Remis vereinbart',drawOffered:c=>`${c} bietet Remis an`,accept:'Annehmen',decline:'Ablehnen',cpuDeclines:'Der Computer lehnt das Remis ab',threats:'Bedrohungen',stats:'Statistik',sW:'S',sL:'N',sD:'R',reset:'Zurücksetzen',frontS:'Vorne',topS:'Oben',shadows:'Schatten',on:'An',off:'Aus',pause:'Pause',paused:'Pausiert',resume:'Fortsetzen',clock:'Uhr',clockOff:'Aus',timeWins:c=>`Zeit abgelaufen! ${c} gewinnt`,timeDraw:'Zeit abgelaufen: Remis',back:'Zurück zum Spiel',drag:'Ziehen, um dich umzusehen',newGame:'Neues Spiel',mode:'Modus',vsCpu:'Gegen den PC',twoP:'Zwei Spieler',colour:'Deine Farbe',white:'Weiß',black:'Schwarz',diff:'Schwierigkeit',lv:['Leicht','Mittel','Schwer','Experte'],board:'Brett',
  bc:['Standard','Teams','Nussbaum','Schwarz','Beton','Elfenbein','Kreide','Neon','U-Bahn','Turnier','Marmor','Ahorn','Stahl','Graffiti'],lang:'Sprache',
  undo:'Zurück',rotate:'Drehen',top:'Draufsicht',front:'Frontansicht',hint:'Tipp',sound:'Ton',tilt:'Neigung',
  yourMove:c=>`Du bist am Zug (<b>${c}</b>)`,checkYour:'<b>Schach!</b> Du bist am Zug',thinking:c=>`<b>${c}</b> denkt nach…`,toMove:c=>`<b>${c}</b> am Zug`,check:'Schach!',
@@ -748,7 +843,7 @@ de:{pSym:'Symbole',backMenu:'Zurück',grpGame:'Partie',grpLook:'Darstellung',inf
  win:'Du hast gewonnen!',lose:'Du hast verloren!',wins:c=>`${c} gewinnt!`,again:'Nochmal spielen',promo:'Bauer umwandeln in',promoN:{q:'Dame',r:'Turm',b:'Läufer',n:'Springer'},cancel:'Abbrechen',
  toast:'Tippe auf eine deiner Figuren, um ihre Züge zu sehen',rotateMsg:'Halte dein Handy hochkant, um zu spielen',loading:'Spraydosen werden geschüttelt…',
  W:{check:'SCHACH!',mate:'MATT!',q:'DAME!',r:'TURM!',b:'LÄUFER!',n:'SPRINGER!'}},
-es:{pSym:'Símbolos',backMenu:'Atrás',grpGame:'Partida',grpLook:'Apariencia',infoT:"Cómo jugar",infoClose:"Cerrar",infoL:["Toca una de tus piezas y luego una casilla resaltada para moverla.", "{undo} retira una jugada, {rotate} da la vuelta al tablero, {view} cambia la vista, \"360°\" te deja mirar alrededor, {hint} sugiere una jugada; el control desliza la inclinación de la cámara. En la vista desde arriba puedes ampliar con dos dedos o con la rueda del ratón.", "{mode}: {vsCpu} o {twoP} en el mismo dispositivo; con {autoRot} el tablero gira hacia quien debe mover. {colour} elige tu bando contra el ordenador.", "{diff}: de {lv0} a {lv3}; {adaptive} se ajusta a tus resultados, y el ordenador recuerda los errores que le costaron una partida.", "{piecesLbl}: {pChars}, o piezas clásicas de {pClassic} o {pSteel}. {board}: con {bc0} el tablero combina con las piezas. {pSym}: fichas planas, siempre vistas desde arriba.", "{clock}: partidas con tiempo para dos, con {pause}. {threats} marca tus piezas atacadas y sin defensa; {shadows} se puede desactivar en dispositivos lentos.", "{resign} y {offerDraw} terminan la partida de mutuo acuerdo.", "{stats}: tus resultados por nivel; {exp} / {imp} los pasa a otro dispositivo."],exp:'Exportar',imp:'Importar',impOk:'Datos importados',impErr:'Archivo no válido',autoRot:'Girar por turno',piecesLbl:'Piezas',pChars:'Personajes',pClassic:'Madera',pSteel:'Acero',adaptive:'Adaptativo',resign:'Abandonar',offerDraw:'Ofrecer tablas',confirm:'¿Confirmar?',resigns:c=>`${c}: abandono`,drawAgreed:'Tablas acordadas',drawOffered:c=>`${c} ofrece tablas`,accept:'Aceptar',decline:'Rechazar',cpuDeclines:'El ordenador rechaza las tablas',threats:'Amenazas',stats:'Estadísticas',sW:'V',sL:'D',sD:'T',reset:'Reiniciar',frontS:'Frente',topS:'Arriba',shadows:'Sombras',on:'Sí',off:'No',pause:'Pausa',paused:'En pausa',resume:'Reanudar',clock:'Reloj',clockOff:'No',timeWins:c=>`¡Tiempo agotado! Ganan las ${c}`,timeDraw:'Tiempo agotado: tablas',back:'Volver al juego',drag:'Arrastra para mirar alrededor',newGame:'Nueva partida',mode:'Modo',vsCpu:'Contra el PC',twoP:'Dos jugadores',colour:'Tu color',white:'Blancas',black:'Negras',diff:'Dificultad',lv:['Fácil','Medio','Difícil','Experto'],board:'Tablero',
+es:{unranked:'No cuenta en las estadísticas',saveMatch:'Guardar',revMode:'Revisar partida',revLoad:'Cargar',revStart:'Inicio',revErr:'PGN no válido',revHint:'Carga una partida (.pgn) o revisa la última',movesT:'Jugadas',pgnCopy:'Copiar PGN',pgnSave:'Guardar .pgn',pgnCopied:'¡Copiado!',noMoves:'Sin jugadas',plName:'Jugador',cpuName:'Ordenador',openLbl:'Apertura',pSym:'Símbolos',backMenu:'Atrás',grpGame:'Partida',grpLook:'Apariencia',infoT:"Cómo jugar",infoClose:"Cerrar",infoL:["Toca una de tus piezas y luego una casilla resaltada para moverla. Durante la apertura, 📖 muestra el nombre de la apertura que se juega.", "{undo} retira una jugada, {rotate} da la vuelta al tablero, {view} cambia la vista, \"360°\" te deja mirar alrededor, {hint} sugiere una jugada; el control desliza la inclinación de la cámara. En la vista desde arriba puedes ampliar con dos dedos o con la rueda del ratón.", "{mode}: {vsCpu} o {twoP} en el mismo dispositivo; con {autoRot} el tablero gira hacia quien debe mover. {colour} elige tu bando contra el ordenador. {revMode}: revisa la partida recién jugada, o carga un archivo .pgn, recorriendo las jugadas con ◀ ▶.", "{diff}: de {lv0} a {lv3}; {adaptive} se ajusta a tus resultados, y el ordenador recuerda los errores que le costaron una partida.", "{piecesLbl}: {pChars}, o piezas clásicas de {pClassic} o {pSteel}. {board}: con {bc0} el tablero combina con las piezas. {pSym}: fichas planas, siempre vistas desde arriba.", "{clock}: partidas con tiempo para dos, con {pause}. {threats} marca tus piezas atacadas y sin defensa; {shadows} se puede desactivar en dispositivos lentos. {openLbl} muestra u oculta el nombre de la apertura.", "{resign} y {offerDraw} terminan la partida de mutuo acuerdo. Al final de la partida puedes {saveMatch} o {revMode} enseguida.", "{stats}: tus resultados por nivel; {exp} / {imp} los pasa a otro dispositivo. {movesT} muestra las jugadas y exporta la partida en PGN. Las estadísticas también se dividen por el color jugado. Solo cuentan las partidas jugadas de principio a fin contra el ordenador, sin deshacer jugadas ni cambiar de modo, nivel o color. Pedir {hint} también excluye la partida de las estadísticas."],exp:'Exportar',imp:'Importar',impOk:'Datos importados',impErr:'Archivo no válido',autoRot:'Girar por turno',piecesLbl:'Piezas',pChars:'Personajes',pClassic:'Madera',pSteel:'Acero',adaptive:'Adaptativo',resign:'Abandonar',offerDraw:'Ofrecer tablas',confirm:'¿Confirmar?',resigns:c=>`${c}: abandono`,drawAgreed:'Tablas acordadas',drawOffered:c=>`${c} ofrece tablas`,accept:'Aceptar',decline:'Rechazar',cpuDeclines:'El ordenador rechaza las tablas',threats:'Amenazas',stats:'Estadísticas',sW:'V',sL:'D',sD:'T',reset:'Reiniciar',frontS:'Frente',topS:'Arriba',shadows:'Sombras',on:'Sí',off:'No',pause:'Pausa',paused:'En pausa',resume:'Reanudar',clock:'Reloj',clockOff:'No',timeWins:c=>`¡Tiempo agotado! Ganan las ${c}`,timeDraw:'Tiempo agotado: tablas',back:'Volver al juego',drag:'Arrastra para mirar alrededor',newGame:'Nueva partida',mode:'Modo',vsCpu:'Contra el PC',twoP:'Dos jugadores',colour:'Tu color',white:'Blancas',black:'Negras',diff:'Dificultad',lv:['Fácil','Medio','Difícil','Experto'],board:'Tablero',
  bc:['Estándar','Equipos','Nogal','Negro','Hormigón','Marfil','Tiza','Neón','Metro','Torneo','Mármol','Arce','Acero','Graffiti'],lang:'Idioma',
  undo:'Deshacer',rotate:'Girar',top:'Vista superior',front:'Vista frontal',hint:'Pista',sound:'Sonido',tilt:'Inclinación',
  yourMove:c=>`Te toca (<b>${c}</b>)`,checkYour:'<b>¡Jaque!</b> Te toca',thinking:c=>`Las <b>${c}</b> piensan…`,toMove:c=>`Juegan las <b>${c}</b>`,check:'¡Jaque!',
@@ -757,7 +852,7 @@ es:{pSym:'Símbolos',backMenu:'Atrás',grpGame:'Partida',grpLook:'Apariencia',in
  win:'¡Has ganado!',lose:'¡Has perdido!',wins:c=>`¡Ganan las ${c}!`,again:'Jugar otra vez',promo:'Promocionar peón a',promoN:{q:'Dama',r:'Torre',b:'Alfil',n:'Caballo'},cancel:'Cancelar',
  toast:'Toca una de tus piezas para ver adónde puede ir',rotateMsg:'Gira el móvil en vertical para jugar',loading:'Agitando los sprays…',
  W:{check:'¡JAQUE!',mate:'¡MATE!',q:'¡DAMA!',r:'¡TORRE!',b:'¡ALFIL!',n:'¡CABALLO!'}},
-pt:{pSym:'Símbolos',backMenu:'Voltar',grpGame:'Partida',grpLook:'Aparência',infoT:"Como jogar",infoClose:"Fechar",infoL:["Toque numa das suas peças e depois numa casa destacada para movê-la.", "{undo} volta uma jogada, {rotate} vira o tabuleiro, {view} muda a vista, \"360°\" deixa olhar em volta, {hint} sugere uma jogada; o controle deslizante inclina a câmera. Na vista de cima você pode ampliar com dois dedos ou com a roda do mouse.", "{mode}: {vsCpu} ou {twoP} no mesmo dispositivo; com {autoRot} o tabuleiro gira para quem deve jogar. {colour} escolhe seu lado contra o computador.", "{diff}: de {lv0} a {lv3}; {adaptive} se ajusta aos seus resultados, e o computador lembra os erros que lhe custaram uma partida.", "{piecesLbl}: {pChars}, ou peças clássicas de {pClassic} ou {pSteel}. {board}: com {bc0} o tabuleiro combina com as peças. {pSym}: peças planas, sempre vistas de cima.", "{clock}: partidas com relógio para dois, com {pause}. {threats} marca suas peças atacadas e sem defesa; {shadows} pode ser desligado em aparelhos lentos.", "{resign} e {offerDraw} encerram a partida em comum acordo.", "{stats}: seus resultados por nível; {exp} / {imp} os leva para outro dispositivo."],exp:'Exportar',imp:'Importar',impOk:'Dados importados',impErr:'Arquivo inválido',autoRot:'Girar por vez',piecesLbl:'Peças',pChars:'Personagens',pClassic:'Madeira',pSteel:'Aço',adaptive:'Adaptativo',resign:'Desistir',offerDraw:'Propor empate',confirm:'Confirmar?',resigns:c=>`${c}: desistência`,drawAgreed:'Empate acordado',drawOffered:c=>`${c} propõe empate`,accept:'Aceitar',decline:'Recusar',cpuDeclines:'O computador recusa o empate',threats:'Ameaças',stats:'Estatísticas',sW:'V',sL:'D',sD:'E',reset:'Zerar',frontS:'Frente',topS:'Cima',shadows:'Sombras',on:'Sim',off:'Não',pause:'Pausa',paused:'Em pausa',resume:'Retomar',clock:'Relógio',clockOff:'Não',timeWins:c=>`Tempo esgotado! Vencem as ${c}`,timeDraw:'Tempo esgotado: empate',back:'Voltar ao jogo',drag:'Arraste para olhar em volta',newGame:'Novo jogo',mode:'Modo',vsCpu:'Contra o PC',twoP:'Dois jogadores',colour:'Sua cor',white:'Brancas',black:'Pretas',diff:'Dificuldade',lv:['Fácil','Médio','Difícil','Especialista'],board:'Tabuleiro',
+pt:{unranked:'Não conta nas estatísticas',saveMatch:'Salvar',revMode:'Rever partida',revLoad:'Carregar',revStart:'Início',revErr:'PGN inválido',revHint:'Carregue uma partida (.pgn) ou reveja a última',movesT:'Lances',pgnCopy:'Copiar PGN',pgnSave:'Salvar .pgn',pgnCopied:'Copiado!',noMoves:'Nenhum lance',plName:'Jogador',cpuName:'Computador',openLbl:'Abertura',pSym:'Símbolos',backMenu:'Voltar',grpGame:'Partida',grpLook:'Aparência',infoT:"Como jogar",infoClose:"Fechar",infoL:["Toque numa das suas peças e depois numa casa destacada para movê-la. Durante a abertura, 📖 mostra o nome da abertura jogada.", "{undo} volta uma jogada, {rotate} vira o tabuleiro, {view} muda a vista, \"360°\" deixa olhar em volta, {hint} sugere uma jogada; o controle deslizante inclina a câmera. Na vista de cima você pode ampliar com dois dedos ou com a roda do mouse.", "{mode}: {vsCpu} ou {twoP} no mesmo dispositivo; com {autoRot} o tabuleiro gira para quem deve jogar. {colour} escolhe seu lado contra o computador. {revMode}: revê a partida recém-jogada, ou carrega um arquivo .pgn, percorrendo os lances com ◀ ▶.", "{diff}: de {lv0} a {lv3}; {adaptive} se ajusta aos seus resultados, e o computador lembra os erros que lhe custaram uma partida.", "{piecesLbl}: {pChars}, ou peças clássicas de {pClassic} ou {pSteel}. {board}: com {bc0} o tabuleiro combina com as peças. {pSym}: peças planas, sempre vistas de cima.", "{clock}: partidas com relógio para dois, com {pause}. {threats} marca suas peças atacadas e sem defesa; {shadows} pode ser desligado em aparelhos lentos. {openLbl} mostra ou oculta o nome da abertura.", "{resign} e {offerDraw} encerram a partida em comum acordo. No fim da partida você pode {saveMatch} ou {revMode} na hora.", "{stats}: seus resultados por nível; {exp} / {imp} os leva para outro dispositivo. {movesT} mostra os lances e exporta a partida em PGN. As estatísticas também são divididas pela cor jogada. Só contam as partidas jogadas do início ao fim contra o computador, sem desfazer lances nem mudar de modo, nível ou cor. Pedir {hint} também exclui a partida das estatísticas."],exp:'Exportar',imp:'Importar',impOk:'Dados importados',impErr:'Arquivo inválido',autoRot:'Girar por vez',piecesLbl:'Peças',pChars:'Personagens',pClassic:'Madeira',pSteel:'Aço',adaptive:'Adaptativo',resign:'Desistir',offerDraw:'Propor empate',confirm:'Confirmar?',resigns:c=>`${c}: desistência`,drawAgreed:'Empate acordado',drawOffered:c=>`${c} propõe empate`,accept:'Aceitar',decline:'Recusar',cpuDeclines:'O computador recusa o empate',threats:'Ameaças',stats:'Estatísticas',sW:'V',sL:'D',sD:'E',reset:'Zerar',frontS:'Frente',topS:'Cima',shadows:'Sombras',on:'Sim',off:'Não',pause:'Pausa',paused:'Em pausa',resume:'Retomar',clock:'Relógio',clockOff:'Não',timeWins:c=>`Tempo esgotado! Vencem as ${c}`,timeDraw:'Tempo esgotado: empate',back:'Voltar ao jogo',drag:'Arraste para olhar em volta',newGame:'Novo jogo',mode:'Modo',vsCpu:'Contra o PC',twoP:'Dois jogadores',colour:'Sua cor',white:'Brancas',black:'Pretas',diff:'Dificuldade',lv:['Fácil','Médio','Difícil','Especialista'],board:'Tabuleiro',
  bc:['Padrão','Equipes','Nogueira','Preto','Concreto','Marfim','Giz','Neon','Metrô','Torneio','Mármore','Bordo','Aço','Graffiti'],lang:'Idioma',
  undo:'Desfazer',rotate:'Girar',top:'Vista de cima',front:'Vista frontal',hint:'Dica',sound:'Som',tilt:'Inclinação',
  yourMove:c=>`Sua vez (<b>${c}</b>)`,checkYour:'<b>Xeque!</b> Sua vez',thinking:c=>`As <b>${c}</b> estão pensando…`,toMove:c=>`Jogam as <b>${c}</b>`,check:'Xeque!',
@@ -766,7 +861,7 @@ pt:{pSym:'Símbolos',backMenu:'Voltar',grpGame:'Partida',grpLook:'Aparência',in
  win:'Você venceu!',lose:'Você perdeu!',wins:c=>`Vencem as ${c}!`,again:'Jogar de novo',promo:'Promover o peão a',promoN:{q:'Dama',r:'Torre',b:'Bispo',n:'Cavalo'},cancel:'Cancelar',
  toast:'Toque em uma das suas peças para ver para onde ela pode ir',rotateMsg:'Coloque o celular na vertical para jogar',loading:'Agitando os sprays…',
  W:{check:'XEQUE!',mate:'MATE!',q:'DAMA!',r:'TORRE!',b:'BISPO!',n:'CAVALO!'}},
-pl:{pSym:'Symbole',backMenu:'Wstecz',grpGame:'Partia',grpLook:'Wygląd',infoT:"Jak grać",infoClose:"Zamknij",infoL:["Dotknij swojej bierki, a potem podświetlonego pola, aby nią ruszyć.", "{undo} cofa ruch, {rotate} obraca planszę, {view} zmienia widok, \"360°\" pozwala się rozejrzeć, {hint} proponuje ruch; suwak pochyla kamerę. W widoku z góry możesz przybliżać dwoma palcami lub kółkiem myszy.", "{mode}: {vsCpu} albo {twoP} na jednym urządzeniu; z {autoRot} plansza obraca się do gracza na ruchu. {colour} wybiera twoją stronę przeciw komputerowi.", "{diff}: od {lv0} do {lv3}; {adaptive} dopasowuje się do twoich wyników, a komputer pamięta błędy, które kosztowały go partię.", "{piecesLbl}: {pChars} albo klasyczne bierki – {pClassic} lub {pSteel}. {board}: przy {bc0} plansza pasuje do bierek. {pSym}: płaskie żetony, zawsze widziane z góry.", "{clock}: partie na czas we dwoje, z {pause}. {threats} zaznacza twoje atakowane i niebronione bierki; {shadows} można wyłączyć na słabszych urządzeniach.", "{resign} i {offerDraw} kończą partię za porozumieniem.", "{stats}: twoje wyniki na każdym poziomie; {exp} / {imp} przenosi je na inne urządzenie."],exp:'Eksportuj',imp:'Importuj',impOk:'Dane zaimportowane',impErr:'Nieprawidłowy plik',autoRot:'Obracaj planszę',piecesLbl:'Bierki',pChars:'Postacie',pClassic:'Drewno',pSteel:'Stal',adaptive:'Adaptacyjny',resign:'Poddaj',offerDraw:'Remis',confirm:'Potwierdzić?',resigns:c=>`${c}: poddanie`,drawAgreed:'Remis uzgodniony',drawOffered:c=>`${c}: propozycja remisu`,accept:'Akceptuj',decline:'Odrzuć',cpuDeclines:'Komputer odrzuca remis',threats:'Zagrożenia',stats:'Statystyki',sW:'W',sL:'P',sD:'R',reset:'Wyzeruj',frontS:'Przód',topS:'Góra',shadows:'Cienie',on:'Wł.',off:'Wył.',pause:'Pauza',paused:'Wstrzymano',resume:'Wznów',clock:'Zegar',clockOff:'Wył.',timeWins:c=>`Koniec czasu! Wygrywają ${c}`,timeDraw:'Koniec czasu: remis',back:'Wróć do gry',drag:'Przeciągnij, aby się rozejrzeć',newGame:'Nowa gra',mode:'Tryb',vsCpu:'Z komputerem',twoP:'Dwóch graczy',colour:'Twój kolor',white:'Białe',black:'Czarne',diff:'Poziom',lv:['Łatwy','Średni','Trudny','Ekspert'],board:'Szachownica',
+pl:{unranked:'Nie liczy się do statystyk',saveMatch:'Zapisz',revMode:'Przegląd partii',revLoad:'Wczytaj',revStart:'Start',revErr:'Nieprawidłowy PGN',revHint:'Wczytaj partię (.pgn) lub przejrzyj ostatnią',movesT:'Ruchy',pgnCopy:'Kopiuj PGN',pgnSave:'Zapisz .pgn',pgnCopied:'Skopiowano!',noMoves:'Brak ruchów',plName:'Gracz',cpuName:'Komputer',openLbl:'Debiut',pSym:'Symbole',backMenu:'Wstecz',grpGame:'Partia',grpLook:'Wygląd',infoT:"Jak grać",infoClose:"Zamknij",infoL:["Dotknij swojej bierki, a potem podświetlonego pola, aby nią ruszyć. W debiucie 📖 pokazuje nazwę granego otwarcia.", "{undo} cofa ruch, {rotate} obraca planszę, {view} zmienia widok, \"360°\" pozwala się rozejrzeć, {hint} proponuje ruch; suwak pochyla kamerę. W widoku z góry możesz przybliżać dwoma palcami lub kółkiem myszy.", "{mode}: {vsCpu} albo {twoP} na jednym urządzeniu; z {autoRot} plansza obraca się do gracza na ruchu. {colour} wybiera twoją stronę przeciw komputerowi. {revMode}: przegląda właśnie rozegraną partię lub wczytuje plik .pgn; ruchy przewijasz ◀ ▶.", "{diff}: od {lv0} do {lv3}; {adaptive} dopasowuje się do twoich wyników, a komputer pamięta błędy, które kosztowały go partię.", "{piecesLbl}: {pChars} albo klasyczne bierki – {pClassic} lub {pSteel}. {board}: przy {bc0} plansza pasuje do bierek. {pSym}: płaskie żetony, zawsze widziane z góry.", "{clock}: partie na czas we dwoje, z {pause}. {threats} zaznacza twoje atakowane i niebronione bierki; {shadows} można wyłączyć na słabszych urządzeniach. {openLbl} pokazuje lub ukrywa nazwę otwarcia.", "{resign} i {offerDraw} kończą partię za porozumieniem. Po partii możesz od razu wybrać {saveMatch} lub {revMode}.", "{stats}: twoje wyniki na każdym poziomie; {exp} / {imp} przenosi je na inne urządzenie. {movesT} pokazuje ruchy i eksportuje partię do PGN. Statystyki są też podzielone według koloru, którym grasz. Liczą się tylko partie rozegrane w całości z komputerem, bez cofania ruchów i bez zmiany trybu, poziomu ani koloru. Skorzystanie z {hint} również wyklucza partię ze statystyk."],exp:'Eksportuj',imp:'Importuj',impOk:'Dane zaimportowane',impErr:'Nieprawidłowy plik',autoRot:'Obracaj planszę',piecesLbl:'Bierki',pChars:'Postacie',pClassic:'Drewno',pSteel:'Stal',adaptive:'Adaptacyjny',resign:'Poddaj',offerDraw:'Remis',confirm:'Potwierdzić?',resigns:c=>`${c}: poddanie`,drawAgreed:'Remis uzgodniony',drawOffered:c=>`${c}: propozycja remisu`,accept:'Akceptuj',decline:'Odrzuć',cpuDeclines:'Komputer odrzuca remis',threats:'Zagrożenia',stats:'Statystyki',sW:'W',sL:'P',sD:'R',reset:'Wyzeruj',frontS:'Przód',topS:'Góra',shadows:'Cienie',on:'Wł.',off:'Wył.',pause:'Pauza',paused:'Wstrzymano',resume:'Wznów',clock:'Zegar',clockOff:'Wył.',timeWins:c=>`Koniec czasu! Wygrywają ${c}`,timeDraw:'Koniec czasu: remis',back:'Wróć do gry',drag:'Przeciągnij, aby się rozejrzeć',newGame:'Nowa gra',mode:'Tryb',vsCpu:'Z komputerem',twoP:'Dwóch graczy',colour:'Twój kolor',white:'Białe',black:'Czarne',diff:'Poziom',lv:['Łatwy','Średni','Trudny','Ekspert'],board:'Szachownica',
  bc:['Domyślna','Drużyny','Orzech','Czarna','Beton','Klasyczna','Kreda','Neon','Metro','Turniejowa','Marmur','Klon','Stal','Graffiti'],lang:'Język',
  undo:'Cofnij',rotate:'Obróć',top:'Widok z góry',front:'Widok z przodu',hint:'Podpowiedź',sound:'Dźwięk',tilt:'Nachylenie',
  yourMove:c=>`Twój ruch (<b>${c}</b>)`,checkYour:'<b>Szach!</b> Twój ruch',thinking:c=>`<b>${c}</b> myślą…`,toMove:c=>`Ruch: <b>${c}</b>`,check:'Szach!',
@@ -775,7 +870,7 @@ pl:{pSym:'Symbole',backMenu:'Wstecz',grpGame:'Partia',grpLook:'Wygląd',infoT:"J
  win:'Wygrałeś!',lose:'Przegrałeś!',wins:c=>`Wygrywają ${c}!`,again:'Zagraj ponownie',promo:'Promuj pionka na',promoN:{q:'Hetman',r:'Wieża',b:'Goniec',n:'Skoczek'},cancel:'Anuluj',
  toast:'Dotknij swojej figury, aby zobaczyć jej ruchy',rotateMsg:'Obróć telefon pionowo, aby grać',loading:'Potrząsam puszkami…',
  W:{check:'SZACH!',mate:'MAT!',q:'HETMAN!',r:'WIEŻA!',b:'GONIEC!',n:'SKOCZEK!'}},
-ru:{pSym:'Символы',backMenu:'Назад',grpGame:'Партия',grpLook:'Вид',infoT:"Как играть",infoClose:"Закрыть",infoL:["Коснитесь своей фигуры, затем подсвеченной клетки, чтобы сделать ход.", "{undo} возвращает ход, {rotate} разворачивает доску, {view} меняет вид, \"360°\" позволяет осмотреться, {hint} предлагает ход; ползунок наклоняет камеру. В виде сверху можно приближать двумя пальцами или колёсиком мыши.", "{mode}: {vsCpu} или {twoP} на одном устройстве; с {autoRot} доска поворачивается к тому, чей ход. {colour} выбирает вашу сторону против компьютера.", "{diff}: от {lv0} до {lv3}; {adaptive} подстраивается под ваши результаты, а компьютер запоминает ошибки, стоившие ему партии.", "{piecesLbl}: {pChars} или классические фигуры — {pClassic} или {pSteel}. {board}: при {bc0} доска подбирается к фигурам. {pSym}: плоские фишки, всегда вид сверху.", "{clock}: партии с часами для двоих, с {pause}. {threats} отмечает ваши атакованные незащищённые фигуры; {shadows} можно отключить на медленных устройствах.", "{resign} и {offerDraw} завершают партию по соглашению.", "{stats}: ваши результаты по уровням; {exp} / {imp} переносит их на другое устройство."],exp:'Экспорт',imp:'Импорт',impOk:'Данные импортированы',impErr:'Неверный файл',autoRot:'Поворот доски',piecesLbl:'Фигуры',pChars:'Персонажи',pClassic:'Дерево',pSteel:'Сталь',adaptive:'Адаптивный',resign:'Сдаться',offerDraw:'Ничья',confirm:'Подтвердить?',resigns:c=>`${c}: сдача`,drawAgreed:'Ничья по соглашению',drawOffered:c=>`${c}: предложение ничьей`,accept:'Принять',decline:'Отклонить',cpuDeclines:'Компьютер отклоняет ничью',threats:'Угрозы',stats:'Статистика',sW:'В',sL:'П',sD:'Н',reset:'Сбросить',frontS:'Спереди',topS:'Сверху',shadows:'Тени',on:'Вкл.',off:'Выкл.',pause:'Пауза',paused:'Пауза',resume:'Продолжить',clock:'Часы',clockOff:'Выкл.',timeWins:c=>`Время вышло! Победили ${c}`,timeDraw:'Время вышло: ничья',back:'Вернуться к игре',drag:'Проведите, чтобы осмотреться',newGame:'Новая игра',mode:'Режим',vsCpu:'Против ПК',twoP:'Два игрока',colour:'Ваш цвет',white:'Белые',black:'Чёрные',diff:'Сложность',lv:['Лёгкий','Средний','Сложный','Эксперт'],board:'Доска',
+ru:{unranked:'Не учитывается в статистике',saveMatch:'Сохранить',revMode:'Просмотр партии',revLoad:'Открыть',revStart:'Начало',revErr:'Неверный PGN',revHint:'Откройте партию (.pgn) или просмотрите последнюю',movesT:'Ходы',pgnCopy:'Копировать PGN',pgnSave:'Сохранить .pgn',pgnCopied:'Скопировано!',noMoves:'Ходов пока нет',plName:'Игрок',cpuName:'Компьютер',openLbl:'Дебют',pSym:'Символы',backMenu:'Назад',grpGame:'Партия',grpLook:'Вид',infoT:"Как играть",infoClose:"Закрыть",infoL:["Коснитесь своей фигуры, затем подсвеченной клетки, чтобы сделать ход. В дебюте 📖 показывает название разыгрываемого дебюта.", "{undo} возвращает ход, {rotate} разворачивает доску, {view} меняет вид, \"360°\" позволяет осмотреться, {hint} предлагает ход; ползунок наклоняет камеру. В виде сверху можно приближать двумя пальцами или колёсиком мыши.", "{mode}: {vsCpu} или {twoP} на одном устройстве; с {autoRot} доска поворачивается к тому, чей ход. {colour} выбирает вашу сторону против компьютера. {revMode}: просмотр только что сыгранной партии или файла .pgn; ходы листаются кнопками ◀ ▶.", "{diff}: от {lv0} до {lv3}; {adaptive} подстраивается под ваши результаты, а компьютер запоминает ошибки, стоившие ему партии.", "{piecesLbl}: {pChars} или классические фигуры — {pClassic} или {pSteel}. {board}: при {bc0} доска подбирается к фигурам. {pSym}: плоские фишки, всегда вид сверху.", "{clock}: партии с часами для двоих, с {pause}. {threats} отмечает ваши атакованные незащищённые фигуры; {shadows} можно отключить на медленных устройствах. {openLbl} показывает или скрывает название дебюта.", "{resign} и {offerDraw} завершают партию по соглашению. После партии можно сразу выбрать {saveMatch} или {revMode}.", "{stats}: ваши результаты по уровням; {exp} / {imp} переносит их на другое устройство. {movesT} показывает ходы и экспортирует партию в PGN. Статистика также разделена по цвету, которым вы играли. Учитываются только партии, сыгранные с компьютером от начала до конца, без отмены ходов и без смены режима, уровня или цвета. Использование {hint} тоже исключает партию из статистики."],exp:'Экспорт',imp:'Импорт',impOk:'Данные импортированы',impErr:'Неверный файл',autoRot:'Поворот доски',piecesLbl:'Фигуры',pChars:'Персонажи',pClassic:'Дерево',pSteel:'Сталь',adaptive:'Адаптивный',resign:'Сдаться',offerDraw:'Ничья',confirm:'Подтвердить?',resigns:c=>`${c}: сдача`,drawAgreed:'Ничья по соглашению',drawOffered:c=>`${c}: предложение ничьей`,accept:'Принять',decline:'Отклонить',cpuDeclines:'Компьютер отклоняет ничью',threats:'Угрозы',stats:'Статистика',sW:'В',sL:'П',sD:'Н',reset:'Сбросить',frontS:'Спереди',topS:'Сверху',shadows:'Тени',on:'Вкл.',off:'Выкл.',pause:'Пауза',paused:'Пауза',resume:'Продолжить',clock:'Часы',clockOff:'Выкл.',timeWins:c=>`Время вышло! Победили ${c}`,timeDraw:'Время вышло: ничья',back:'Вернуться к игре',drag:'Проведите, чтобы осмотреться',newGame:'Новая игра',mode:'Режим',vsCpu:'Против ПК',twoP:'Два игрока',colour:'Ваш цвет',white:'Белые',black:'Чёрные',diff:'Сложность',lv:['Лёгкий','Средний','Сложный','Эксперт'],board:'Доска',
  bc:['Стандартная','Команды','Орех','Чёрная','Бетон','Классика','Мел','Неон','Метро','Турнир','Мрамор','Клён','Сталь','Граффити'],lang:'Язык',
  undo:'Отменить',rotate:'Повернуть',top:'Вид сверху',front:'Вид спереди',hint:'Подсказка',sound:'Звук',tilt:'Наклон',
  yourMove:c=>`Ваш ход (<b>${c}</b>)`,checkYour:'<b>Шах!</b> Ваш ход',thinking:c=>`<b>${c}</b> думают…`,toMove:c=>`Ход: <b>${c}</b>`,check:'Шах!',
@@ -784,7 +879,7 @@ ru:{pSym:'Символы',backMenu:'Назад',grpGame:'Партия',grpLook:'
  win:'Вы победили!',lose:'Вы проиграли!',wins:c=>`Победили ${c}!`,again:'Играть снова',promo:'Превратить пешку в',promoN:{q:'Ферзь',r:'Ладья',b:'Слон',n:'Конь'},cancel:'Отмена',
  toast:'Коснитесь своей фигуры, чтобы увидеть её ходы',rotateMsg:'Поверните телефон вертикально, чтобы играть',loading:'Трясём баллончики…',
  W:{check:'ШАХ!',mate:'МАТ!',q:'ФЕРЗЬ!',r:'ЛАДЬЯ!',b:'СЛОН!',n:'КОНЬ!'}},
-tr:{pSym:'Semboller',backMenu:'Geri',grpGame:'Oyun',grpLook:'Görünüm',infoT:"Nasıl oynanır",infoClose:"Kapat",infoL:["Bir taşına, sonra vurgulanan bir kareye dokunarak hamle yap.", "{undo} bir hamleyi geri alır, {rotate} tahtayı döndürür, {view} görünümü değiştirir, \"360°\" etrafa bakmanı sağlar, {hint} bir hamle önerir; kaydırıcı kamerayı eğer. Üstten görünümde iki parmakla veya fare tekerleğiyle yakınlaştırabilirsin.", "{mode}: {vsCpu} ya da aynı cihazda {twoP}; {autoRot} açıkken tahta sırası gelen oyuncuya döner. {colour} bilgisayara karşı tarafını seçer.", "{diff}: {lv0} ile {lv3} arası; {adaptive} sonuçlarına göre ayarlanır ve bilgisayar ona oyun kaybettiren hataları hatırlar.", "{piecesLbl}: {pChars} ya da {pClassic} veya {pSteel} klasik taşlar. {board}: {bc0} seçiliyken tahta taşlara uyar. {pSym}: düz taşlar, hep yukarıdan görünür.", "{clock}: iki kişilik süreli oyunlar, {pause} ile. {threats} saldırı altındaki savunmasız taşlarını gösterir; {shadows} yavaş cihazlarda kapatılabilir.", "{resign} ve {offerDraw} oyunu anlaşmayla bitirir.", "{stats}: seviyelere göre sonuçların; {exp} / {imp} onları başka bir cihaza taşır."],exp:'Dışa aktar',imp:'İçe aktar',impOk:'Veriler içe aktarıldı',impErr:'Geçersiz dosya',autoRot:'Tahtayı çevir',piecesLbl:'Taşlar',pChars:'Karakterler',pClassic:'Ahşap',pSteel:'Çelik',adaptive:'Uyarlanabilir',resign:'Terk et',offerDraw:'Beraberlik',confirm:'Onaylıyor musun?',resigns:c=>`${c} terk etti`,drawAgreed:'Anlaşmalı beraberlik',drawOffered:c=>`${c} beraberlik teklif ediyor`,accept:'Kabul et',decline:'Reddet',cpuDeclines:'Bilgisayar beraberliği reddediyor',threats:'Tehditler',stats:'İstatistikler',sW:'G',sL:'M',sD:'B',reset:'Sıfırla',frontS:'Ön',topS:'Üst',shadows:'Gölgeler',on:'Açık',off:'Kapalı',pause:'Duraklat',paused:'Duraklatıldı',resume:'Devam et',clock:'Saat',clockOff:'Kapalı',timeWins:c=>`Süre doldu! ${c} kazandı`,timeDraw:'Süre doldu: berabere',back:'Oyuna dön',drag:'Etrafa bakmak için sürükle',newGame:'Yeni oyun',mode:'Mod',vsCpu:'Bilgisayara karşı',twoP:'İki oyuncu',colour:'Rengin',white:'Beyaz',black:'Siyah',diff:'Zorluk',lv:['Kolay','Orta','Zor','Uzman'],board:'Tahta',
+tr:{unranked:'İstatistiklere sayılmaz',saveMatch:'Kaydet',revMode:'Oyunu incele',revLoad:'Yükle',revStart:'Başlangıç',revErr:'Geçersiz PGN',revHint:'Bir oyun (.pgn) yükle ya da sonuncuyu incele',movesT:'Hamleler',pgnCopy:'PGN kopyala',pgnSave:'.pgn kaydet',pgnCopied:'Kopyalandı!',noMoves:'Henüz hamle yok',plName:'Oyuncu',cpuName:'Bilgisayar',openLbl:'Açılış adı',pSym:'Semboller',backMenu:'Geri',grpGame:'Oyun',grpLook:'Görünüm',infoT:"Nasıl oynanır",infoClose:"Kapat",infoL:["Bir taşına, sonra vurgulanan bir kareye dokunarak hamle yap. Açılış sırasında 📖 oynanan açılışın adını gösterir.", "{undo} bir hamleyi geri alır, {rotate} tahtayı döndürür, {view} görünümü değiştirir, \"360°\" etrafa bakmanı sağlar, {hint} bir hamle önerir; kaydırıcı kamerayı eğer. Üstten görünümde iki parmakla veya fare tekerleğiyle yakınlaştırabilirsin.", "{mode}: {vsCpu} ya da aynı cihazda {twoP}; {autoRot} açıkken tahta sırası gelen oyuncuya döner. {colour} bilgisayara karşı tarafını seçer. {revMode}: az önce oynanan oyunu inceler veya bir .pgn dosyası yükler; hamleler arasında ◀ ▶ ile gezinirsin.", "{diff}: {lv0} ile {lv3} arası; {adaptive} sonuçlarına göre ayarlanır ve bilgisayar ona oyun kaybettiren hataları hatırlar.", "{piecesLbl}: {pChars} ya da {pClassic} veya {pSteel} klasik taşlar. {board}: {bc0} seçiliyken tahta taşlara uyar. {pSym}: düz taşlar, hep yukarıdan görünür.", "{clock}: iki kişilik süreli oyunlar, {pause} ile. {threats} saldırı altındaki savunmasız taşlarını gösterir; {shadows} yavaş cihazlarda kapatılabilir. {openLbl} açılışın adını gösterir veya gizler.", "{resign} ve {offerDraw} oyunu anlaşmayla bitirir. Oyun bitince hemen {saveMatch} veya {revMode} seçebilirsin.", "{stats}: seviyelere göre sonuçların; {exp} / {imp} onları başka bir cihaza taşır. {movesT} hamleleri listeler ve oyunu PGN olarak dışa aktarır. İstatistikler oynanan renge göre de ayrılır. Yalnızca baştan sona bilgisayara karşı, hamle geri almadan ve mod, seviye ya da renk değiştirmeden oynanan oyunlar sayılır. {hint} istemek de oyunu istatistik dışı bırakır."],exp:'Dışa aktar',imp:'İçe aktar',impOk:'Veriler içe aktarıldı',impErr:'Geçersiz dosya',autoRot:'Tahtayı çevir',piecesLbl:'Taşlar',pChars:'Karakterler',pClassic:'Ahşap',pSteel:'Çelik',adaptive:'Uyarlanabilir',resign:'Terk et',offerDraw:'Beraberlik',confirm:'Onaylıyor musun?',resigns:c=>`${c} terk etti`,drawAgreed:'Anlaşmalı beraberlik',drawOffered:c=>`${c} beraberlik teklif ediyor`,accept:'Kabul et',decline:'Reddet',cpuDeclines:'Bilgisayar beraberliği reddediyor',threats:'Tehditler',stats:'İstatistikler',sW:'G',sL:'M',sD:'B',reset:'Sıfırla',frontS:'Ön',topS:'Üst',shadows:'Gölgeler',on:'Açık',off:'Kapalı',pause:'Duraklat',paused:'Duraklatıldı',resume:'Devam et',clock:'Saat',clockOff:'Kapalı',timeWins:c=>`Süre doldu! ${c} kazandı`,timeDraw:'Süre doldu: berabere',back:'Oyuna dön',drag:'Etrafa bakmak için sürükle',newGame:'Yeni oyun',mode:'Mod',vsCpu:'Bilgisayara karşı',twoP:'İki oyuncu',colour:'Rengin',white:'Beyaz',black:'Siyah',diff:'Zorluk',lv:['Kolay','Orta','Zor','Uzman'],board:'Tahta',
  bc:['Varsayılan','Takımlar','Ceviz','Siyah','Beton','Fildişi','Tebeşir','Neon','Metro','Turnuva','Mermer','Akçaağaç','Çelik','Graffiti'],lang:'Dil',
  undo:'Geri al',rotate:'Döndür',top:'Üstten',front:'Önden',hint:'İpucu',sound:'Ses',tilt:'Eğim',
  yourMove:c=>`Sıra sende (<b>${c}</b>)`,checkYour:'<b>Şah!</b> Sıra sende',thinking:c=>`<b>${c}</b> düşünüyor…`,toMove:c=>`Sıra: <b>${c}</b>`,check:'Şah!',
@@ -793,7 +888,7 @@ tr:{pSym:'Semboller',backMenu:'Geri',grpGame:'Oyun',grpLook:'Görünüm',infoT:"
  win:'Kazandın!',lose:'Kaybettin!',wins:c=>`${c} kazandı!`,again:'Tekrar oyna',promo:'Piyonu terfi ettir',promoN:{q:'Vezir',r:'Kale',b:'Fil',n:'At'},cancel:'İptal',
  toast:'Nereye gidebileceğini görmek için bir taşına dokun',rotateMsg:'Oynamak için telefonu dik tut',loading:'Spreyler çalkalanıyor…',
  W:{check:'ŞAH!',mate:'MAT!',q:'VEZİR!',r:'KALE!',b:'FİL!',n:'AT!'}},
-id:{pSym:'Simbol',backMenu:'Kembali',grpGame:'Permainan',grpLook:'Tampilan',infoT:"Cara bermain",infoClose:"Tutup",infoL:["Ketuk salah satu bidakmu, lalu kotak yang disorot untuk memindahkannya.", "{undo} menarik langkah, {rotate} membalik papan, {view} mengganti tampilan, \"360°\" untuk melihat sekeliling, {hint} menyarankan langkah; penggeser memiringkan kamera. Di tampilan atas kamu bisa memperbesar dengan dua jari atau roda tetikus.", "{mode}: {vsCpu} atau {twoP} di satu perangkat; dengan {autoRot} papan berputar ke pemain yang mendapat giliran. {colour} memilih sisimu melawan komputer.", "{diff}: dari {lv0} sampai {lv3}; {adaptive} menyesuaikan dengan hasilmu, dan komputer mengingat kesalahan yang membuatnya kalah.", "{piecesLbl}: {pChars}, atau bidak klasik {pClassic} atau {pSteel}. {board}: dengan {bc0} papan menyesuaikan bidak. {pSym}: keping datar, selalu terlihat dari atas.", "{clock}: permainan berwaktu untuk dua orang, dengan {pause}. {threats} menandai bidakmu yang diserang dan tak terlindungi; {shadows} bisa dimatikan di perangkat lambat.", "{resign} dan {offerDraw} mengakhiri permainan dengan kesepakatan.", "{stats}: hasilmu per tingkat; {exp} / {imp} memindahkannya ke perangkat lain."],exp:'Ekspor',imp:'Impor',impOk:'Data diimpor',impErr:'File tidak valid',autoRot:'Putar papan',piecesLbl:'Bidak',pChars:'Karakter',pClassic:'Kayu',pSteel:'Baja',adaptive:'Adaptif',resign:'Menyerah',offerDraw:'Tawarkan remis',confirm:'Yakin?',resigns:c=>`${c} menyerah`,drawAgreed:'Remis disepakati',drawOffered:c=>`${c} menawarkan remis`,accept:'Terima',decline:'Tolak',cpuDeclines:'Komputer menolak remis',threats:'Ancaman',stats:'Statistik',sW:'M',sL:'K',sD:'S',reset:'Atur ulang',frontS:'Depan',topS:'Atas',shadows:'Bayangan',on:'Aktif',off:'Mati',pause:'Jeda',paused:'Dijeda',resume:'Lanjutkan',clock:'Jam',clockOff:'Mati',timeWins:c=>`Waktu habis! ${c} menang`,timeDraw:'Waktu habis: remis',back:'Kembali bermain',drag:'Seret untuk melihat sekeliling',newGame:'Permainan baru',mode:'Mode',vsCpu:'Lawan komputer',twoP:'Dua pemain',colour:'Warnamu',white:'Putih',black:'Hitam',diff:'Tingkat kesulitan',lv:['Mudah','Sedang','Sulit','Ahli'],board:'Papan',
+id:{unranked:'Tidak dihitung di statistik',saveMatch:'Simpan',revMode:'Tinjau permainan',revLoad:'Muat',revStart:'Awal',revErr:'PGN tidak valid',revHint:'Muat permainan (.pgn) atau tinjau yang terakhir',movesT:'Langkah',pgnCopy:'Salin PGN',pgnSave:'Simpan .pgn',pgnCopied:'Disalin!',noMoves:'Belum ada langkah',plName:'Pemain',cpuName:'Komputer',openLbl:'Nama pembukaan',pSym:'Simbol',backMenu:'Kembali',grpGame:'Permainan',grpLook:'Tampilan',infoT:"Cara bermain",infoClose:"Tutup",infoL:["Ketuk salah satu bidakmu, lalu kotak yang disorot untuk memindahkannya. Saat pembukaan, 📖 menampilkan nama pembukaan yang dimainkan.", "{undo} menarik langkah, {rotate} membalik papan, {view} mengganti tampilan, \"360°\" untuk melihat sekeliling, {hint} menyarankan langkah; penggeser memiringkan kamera. Di tampilan atas kamu bisa memperbesar dengan dua jari atau roda tetikus.", "{mode}: {vsCpu} atau {twoP} di satu perangkat; dengan {autoRot} papan berputar ke pemain yang mendapat giliran. {colour} memilih sisimu melawan komputer. {revMode}: meninjau permainan yang baru dimainkan, atau memuat file .pgn, menelusuri langkah dengan ◀ ▶.", "{diff}: dari {lv0} sampai {lv3}; {adaptive} menyesuaikan dengan hasilmu, dan komputer mengingat kesalahan yang membuatnya kalah.", "{piecesLbl}: {pChars}, atau bidak klasik {pClassic} atau {pSteel}. {board}: dengan {bc0} papan menyesuaikan bidak. {pSym}: keping datar, selalu terlihat dari atas.", "{clock}: permainan berwaktu untuk dua orang, dengan {pause}. {threats} menandai bidakmu yang diserang dan tak terlindungi; {shadows} bisa dimatikan di perangkat lambat. {openLbl} menampilkan atau menyembunyikan nama pembukaan.", "{resign} dan {offerDraw} mengakhiri permainan dengan kesepakatan. Di akhir permainan kamu bisa langsung {saveMatch} atau {revMode}.", "{stats}: hasilmu per tingkat; {exp} / {imp} memindahkannya ke perangkat lain. {movesT} menampilkan langkah dan mengekspor permainan sebagai PGN. Statistik juga dipisahkan menurut warna yang dimainkan. Hanya permainan yang dimainkan penuh melawan komputer yang dihitung, tanpa mengurungkan langkah atau mengganti mode, tingkat, maupun warna. Meminta {hint} juga mengeluarkan permainan dari statistik."],exp:'Ekspor',imp:'Impor',impOk:'Data diimpor',impErr:'File tidak valid',autoRot:'Putar papan',piecesLbl:'Bidak',pChars:'Karakter',pClassic:'Kayu',pSteel:'Baja',adaptive:'Adaptif',resign:'Menyerah',offerDraw:'Tawarkan remis',confirm:'Yakin?',resigns:c=>`${c} menyerah`,drawAgreed:'Remis disepakati',drawOffered:c=>`${c} menawarkan remis`,accept:'Terima',decline:'Tolak',cpuDeclines:'Komputer menolak remis',threats:'Ancaman',stats:'Statistik',sW:'M',sL:'K',sD:'S',reset:'Atur ulang',frontS:'Depan',topS:'Atas',shadows:'Bayangan',on:'Aktif',off:'Mati',pause:'Jeda',paused:'Dijeda',resume:'Lanjutkan',clock:'Jam',clockOff:'Mati',timeWins:c=>`Waktu habis! ${c} menang`,timeDraw:'Waktu habis: remis',back:'Kembali bermain',drag:'Seret untuk melihat sekeliling',newGame:'Permainan baru',mode:'Mode',vsCpu:'Lawan komputer',twoP:'Dua pemain',colour:'Warnamu',white:'Putih',black:'Hitam',diff:'Tingkat kesulitan',lv:['Mudah','Sedang','Sulit','Ahli'],board:'Papan',
  bc:['Bawaan','Tim','Kenari','Hitam','Beton','Gading','Kapur','Neon','Metro','Turnamen','Marmer','Mapel','Baja','Graffiti'],lang:'Bahasa',
  undo:'Batal',rotate:'Putar',top:'Tampak atas',front:'Tampak depan',hint:'Petunjuk',sound:'Suara',tilt:'Kemiringan',
  yourMove:c=>`Giliranmu (<b>${c}</b>)`,checkYour:'<b>Skak!</b> Giliranmu',thinking:c=>`<b>${c}</b> sedang berpikir…`,toMove:c=>`Giliran <b>${c}</b>`,check:'Skak!',
@@ -810,14 +905,14 @@ function infoFill(x,t){   // command names come from the interface itself, in qu
 function applyLang(){
   const t=L(); document.documentElement.lang=LANG;
   const set=(id,txt)=>{ const e=document.getElementById(id); if(e) e.textContent=txt; };
-  set('newBtn',t.newGame); set('resignBtn',t.resign); set('drawBtn',t.offerDraw); set('drawYes',t.accept); set('drawNo',t.decline); set('statsReset',t.reset); set('expBtn',t.exp); set('statsBtn',t.stats); $('statsBack').textContent='‹ '+t.backMenu; $('infoBack').textContent='‹ '+t.backMenu; set('grpGame',t.grpGame); set('grpLook',t.grpLook); set('statsClose',t.infoClose); $('infoBtn').textContent='ⓘ '+t.infoT; $('infoTitle').textContent=t.infoT; $('infoClose').textContent=t.infoClose; $('infoList').innerHTML=t.infoL.map(x=>'<li>'+infoFill(x,t)+'</li>').join(''); set('impBtn',t.imp); $('statsTitle').textContent=t.stats; document.querySelector('#pauseBtn .lbl').textContent=' '+t.pause; $('pauseBtn').title=t.pause; $('pauseBtn').setAttribute('aria-label',t.pause);
+  set('newBtn',t.newGame); set('resignBtn',t.resign); set('drawBtn',t.offerDraw); set('drawYes',t.accept); set('drawNo',t.decline); set('statsReset',t.reset); set('expBtn',t.exp); set('statsBtn',t.stats); set('revGameBtn',t.revMode); set('saveGameBtn',t.saveMatch); set('movesBtn','📜 '+t.movesT); set('movesTitle',t.movesT); set('pgnCopy',t.pgnCopy); set('pgnSave',t.pgnSave); $('movesBack').textContent='‹ '+t.backMenu; set('movesClose',t.infoClose); $('statsBack').textContent='‹ '+t.backMenu; $('infoBack').textContent='‹ '+t.backMenu; set('grpGame',t.grpGame); set('grpLook',t.grpLook); set('statsClose',t.infoClose); $('infoBtn').textContent='ⓘ '+t.infoT; $('infoTitle').textContent=t.infoT; $('infoClose').textContent=t.infoClose; $('infoList').innerHTML=t.infoL.map(x=>'<li>'+infoFill(x,t)+'</li>').join(''); set('impBtn',t.imp); $('statsTitle').textContent=t.stats; document.querySelector('#pauseBtn .lbl').textContent=' '+t.pause; $('pauseBtn').title=t.pause; $('pauseBtn').setAttribute('aria-label',t.pause);
   document.querySelector('#pauseOv .big').textContent=t.paused; $('resumeBtn').textContent='▶ '+t.resume; document.querySelector('#backBtn .txt').textContent=t.back; set('againBtn',t.again); set('promoCancel',t.cancel);
   document.querySelector('#promo .ptitle').textContent=t.promo;
   set('hint',t.toast); document.querySelector('#rotateMsg .txt').textContent=t.rotateMsg;
   const lab=(sel,txt)=>{ const s=document.getElementById(sel); if(s&&s.parentElement.firstChild) s.parentElement.firstChild.nodeValue=txt; };
-  lab('mode',t.mode); lab('side',t.colour); lab('level',t.diff); lab('boardSel',t.board); lab('langSel',t.lang); lab('clockSel',t.clock); $('clockSel').options[0].textContent=t.clockOff; lab('pieceSel',t.piecesLbl); lab('flipSel',t.autoRot); $('flipSel').options[0].textContent=t.off; $('flipSel').options[1].textContent=t.on; $('pieceSel').options[0].textContent=t.pChars; $('pieceSel').options[1].textContent=t.pClassic; $('pieceSel').options[2].textContent=t.pSteel; $('pieceSel').options[3].textContent=t.pSym; lab('threatSel',t.threats); $('threatSel').options[0].textContent=t.off; $('threatSel').options[1].textContent=t.on; if(typeof renderStats==='function') renderStats(); lab('shadowSel',t.shadows); $('shadowSel').options[0].textContent=t.on; $('shadowSel').options[1].textContent=t.off;
+  lab('mode',t.mode); lab('side',t.colour); lab('level',t.diff); lab('boardSel',t.board); lab('langSel',t.lang); lab('clockSel',t.clock); $('clockSel').options[0].textContent=t.clockOff; lab('pieceSel',t.piecesLbl); lab('openSel',t.openLbl); $('openSel').options[0].textContent=t.off; $('openSel').options[1].textContent=t.on; lab('flipSel',t.autoRot); $('flipSel').options[0].textContent=t.off; $('flipSel').options[1].textContent=t.on; $('pieceSel').options[0].textContent=t.pChars; $('pieceSel').options[1].textContent=t.pClassic; $('pieceSel').options[2].textContent=t.pSteel; $('pieceSel').options[3].textContent=t.pSym; lab('threatSel',t.threats); $('threatSel').options[0].textContent=t.off; $('threatSel').options[1].textContent=t.on; if(typeof renderStats==='function') renderStats(); lab('shadowSel',t.shadows); $('shadowSel').options[0].textContent=t.on; $('shadowSel').options[1].textContent=t.off;
   const opt=(sel,map)=>{ const s=document.getElementById(sel); [...s.options].forEach((o,i)=>{ const v=typeof map==='function'?map(o.value,i):map[i]; if(v) o.textContent=v; }); };
-  opt('mode',[t.vsCpu,t.twoP]); opt('side',[t.white,t.black]); opt('level',t.lv); $('level').options[4].textContent=t.adaptive; opt('boardSel',t.bc);
+  opt('mode',[t.vsCpu,t.twoP]); $('mode').options[2].textContent=t.revMode; $('revLoad').textContent='📂 '+t.revLoad; opt('side',[t.white,t.black]); opt('level',t.lv); $('level').options[4].textContent=t.adaptive; opt('boardSel',t.bc);
   document.querySelector('#undoBtn .lbl').textContent=' '+t.undo; document.querySelector('#flipBtn .lbl').textContent=' '+t.rotate; document.querySelector('#hintBtn .lbl').textContent=' '+t.hint;
   for(const [id,txt] of [['undoBtn',t.undo],['flipBtn',t.rotate],['hintBtn',t.hint],['muteBtn',t.sound]]){ const e=document.getElementById(id); e.title=txt; e.setAttribute('aria-label',txt); }
   const tl=document.querySelector('label.tilt'); if(tl){ tl.title=t.tilt; document.getElementById('tilt').setAttribute('aria-label',t.tilt); }
@@ -1902,8 +1997,11 @@ function makeClassic(t,c){
   const RB=R*.86, base=[[0,0],[RB,0],[RB,.045],[RB*.9,.07],[RB*.86,.1],[R*.6,.14]];   // foot slightly narrower than before
   let top=.5;
   if(t==='p'){ lathe([...base,[R*.4,.22],[R*.33,.3],[R*.52,.32],[R*.52,.345],[R*.3,.36],[0,.37]]); addPart(rig,Sph(.105,16,12),head,0,.45,0,{ow:.014,plain:true}); top=.56; }
-  if(t==='r'){ lathe([...base,[R*.58,.2],[R*.55,.4],[R*.7,.44],[R*.72,.56],[0,.56]]);
-    for(let i=0;i<5;i++){ const a=i/5*Math.PI*2; addPart(rig,Box(.075,.07,.06),head,Math.cos(a)*.15,.595,Math.sin(a)*.15,{rot:[0,-a,0],ow:.014,plain:true}); } top=.63; }
+  if(t==='r'){   // a squat tower: wide straight body, a thin team-coloured band and four big square battlements in the piece's own wood/steel (unlike the queen's coloured crown)
+    lathe([...base,[R*.62,.2],[R*.6,.38],[R*.8,.42],[R*.82,.55],[0,.55]]);
+    addPart(rig,new T.TorusGeometry(R*.81,.014,6,28),head,0,.44,0,{rot:[Math.PI/2,0,0],outline:false});
+    addPart(rig,new T.CylinderGeometry(R*.8,R*.8,.008,28),head,0,.554,0,{outline:false});   // the top platform in the team colour; the battlements stay wood/steel
+    for(let i=0;i<4;i++){ const a=i/4*Math.PI*2+Math.PI/4; addPart(rig,Box(.1,.085,.075),col,Math.cos(a)*.17,.592,Math.sin(a)*.17,{rot:[0,-a,0],ow:.014,plain:true}); } top=.64; }
   if(t==='b'){ lathe([...base,[R*.4,.28],[R*.3,.42],[R*.52,.45],[R*.52,.475],[R*.28,.49],[0,.5]]);
     // mitre with a notch: two halves of one shape, hinged low on the slanted cut and opened slightly at the top (a V-shaped groove)
     { const th=.62, nx=Math.cos(th), ny=Math.sin(th)/1.45, nl=Math.hypot(nx,ny), n=[nx/nl,ny/nl], d=[-n[1],n[0]];   // n: cut normal, d: along the cut (upwards)
@@ -2602,8 +2700,17 @@ function updateCaps(){
     return `<div class="row"><span class="dot" style="background:${PAL[c].accent}"></span><span class="pcs" style="color:${col}">${list.map(t=>GLYPH[t]).join('')}</span>${adv>0?`<span class="adv">+${adv}</span>`:''}</div>`; };
   $('caps').innerHTML=history.some(u=>u.cap)||mat?row('w')+row('b'):'';
 }
+let curOpeningKey=null, curOpeningOld=false, OPENING_ON=true; try{ OPENING_ON=localStorage.getItem('gc-opening')!=='0'; }catch(e){}
+function updateOpening(){   // shows the name of the opening being played, from the repertoire; it stays (dimmed) once the game leaves theory
+  if(!history.length) curOpeningKey=null;
+  else { const k=H1+':'+H2; if(openingName(k,LANG)){ curOpeningKey=k; curOpeningOld=false; } else if(curOpeningKey) curOpeningOld=true; }
+  const name=curOpeningKey?openingName(curOpeningKey,LANG):null, el=$('opening');   // looked up again each time, so it follows the language
+  el.hidden=!name||!OPENING_ON; if(name){ el.textContent='📖 '+name; el.classList.toggle('old',curOpeningOld); }
+}
 function updateStatus(){
-  updateCaps(); showThreats(); autoFlip();
+  updateCaps(); showThreats(); autoFlip(); try{ updateOpening(); }catch(e){}
+  { const u=$('unranked'), show=!REVIEW.active&&mode()==='cpu'&&!GAME_RANKED; u.hidden=!show; if(show) u.textContent='⚠ '+L().unranked; }
+  if(REVIEW.active){ setStatus(reviewStatus()); return; }
   if(over) return;
   const chk=inCheck(TURN);
   const t=L();
@@ -2615,12 +2722,13 @@ function hideBanner(){$('banner').style.display='none';}
 
 const human=()=>$('side').value;
 function newGame(animated){
+  if(REVIEW.active){ $('mode').value=PLAY_MODE; $('mode').onchange(); }   // a new game always leaves the review and returns to playing
   SFX.cancelPending();
   $('promo').style.display='none'; picking=false;
   gameToken++; busy=false; thinking=false; over=false; selected=null; history=[]; lastMove=null;
   hideBanner(); clearMarks(); showLast();
   splats.forEach(s=>{ scene.remove(s.m); s.m.geometry.dispose(); s.m.material.dispose(); }); splats.length=0;
-  resetBoard(); syncVisuals(); legalCache=legalMoves(); clearCelebration(); resetClock(); resultDone=false; CPU_LOG=[]; $('drawOv').hidden=true; updateStatus(); saveGame();
+  resetBoard(); syncVisuals(); legalCache=legalMoves(); clearCelebration(); resetClock(); resultDone=false; CPU_LOG=[]; RESULT_TAG=null; END_TXT=null; GAME_RANKED=true; HINT_USED=false; $('drawOv').hidden=true; updateStatus(); saveGame();
   setFlip(mode()==='cpu'&&human()==='b');
   if(animated) dropIn().then(()=>maybeAI()); else maybeAI();
 }
@@ -2660,9 +2768,9 @@ function clockOnMove(mover){   // called right after a move is made
 }
 function clockFlag(){
   over=true; CLK.running=false; setPaused(false);
-  const loser=TURN, winner=opp(TURN); let pieces=[]; for(let i=0;i<64;i++){ const p=B[i]; if(p&&p.c===winner&&p.t!=='k') pieces.push(p.t); }
+  const loser=TURN, winner=opp(TURN); RESULT_TAG=winner==='w'?'1-0':'0-1'; let pieces=[]; for(let i=0;i<64;i++){ const p=B[i]; if(p&&p.c===winner&&p.t!=='k') pieces.push(p.t); }
   const cannotMate=!pieces.length||(pieces.length===1&&(pieces[0]==='n'||pieces[0]==='b'));
-  const txt=cannotMate?L().timeDraw:L().timeWins(colorName(winner));
+  const txt=cannotMate?L().timeDraw:L().timeWins(colorName(winner)); if(cannotMate) RESULT_TAG='1/2-1/2';
   setStatus('<b>'+txt+'</b>'); SFX.play(cannotMate?'draw':'mate'); updateClockUI(); saveGame(); setTimeout(()=>banner(txt),400);
 }
 function clockTick(now){
@@ -2721,20 +2829,187 @@ let STATS={}; try{ STATS=JSON.parse(localStorage.getItem('gc-stats')||'{}'); }ca
 let resultDone=false;
 function recordResult(res){   // res from the human's point of view: 'w' | 'l' | 'd'
   if(resultDone||mode()!=='cpu'||!history.length) return; resultDone=true;
-  const lv=$('level').value; STATS[lv]=STATS[lv]||{w:0,l:0,d:0}; STATS[lv][res]++;
+  if(!GAME_RANKED) return;   // not played straight through against the computer: neither statistics nor learning
+  const lv=$('level').value, ck=human()==='w'?'cw':'cb'; STATS[lv]=STATS[lv]||{w:0,l:0,d:0}; STATS[lv][res]++;
+  STATS[lv][ck]=STATS[lv][ck]||{w:0,l:0,d:0}; STATS[lv][ck][res]++;   // also split by the colour played
   try{ localStorage.setItem('gc-stats',JSON.stringify(STATS)); }catch(e){} learnFrom(res);
 }
 function renderStats(){
   const t=L(), rows=[];
   for(const lv of ['1','2','3','4','5']){ const r=STATS[lv]||{w:0,l:0,d:0};
-    rows.push(`<div><span>${lv==='5'?t.adaptive:t.lv[+lv-1]}</span><span>${t.sW} ${r.w} · ${t.sL} ${r.l} · ${t.sD} ${r.d}</span></div>`); }
+    rows.push(`<div><span>${lv==='5'?t.adaptive:t.lv[+lv-1]}</span><span>${t.sW} ${r.w} · ${t.sL} ${r.l} · ${t.sD} ${r.d}</span></div>`);
+    for(const [k,c] of [['cw','w'],['cb','b']]){ const q=r[k]; if(q&&(q.w+q.l+q.d)) rows.push(`<div class="sub"><span>${c==='w'?'♔':'♚'} ${colorName(c)}</span><span>${t.sW} ${q.w} · ${t.sL} ${q.l} · ${t.sD} ${q.d}</span></div>`); } }
   const f=Math.floor(ADAPT), lvTxt=ADAPT>=4?t.lv[3]:(ADAPT===f?t.lv[f-1]:t.lv[f-1]+'–'+t.lv[f]);
   rows.push(`<div class="lvnow"><span>${t.adaptive}</span><span>${lvTxt}</span></div>`);
   $('statsTbl').innerHTML=rows.join('');
 }
 // ---- resign / draw by agreement ----
+// ---- move list (figurine notation on screen) and PGN export (standard English notation) ----
+let RESULT_TAG=null, END_TXT=null, PLAY_MODE='cpu', GAME_RANKED=true, HINT_USED=false;   // false once the game is no longer 'one-way' (mode, level or colour changed, or a take-back)
+function unrank(){ if(history.length&&!over&&GAME_RANKED){ GAME_RANKED=false; saveGame(); updateStatus(); } }   // the last playing mode (the review keeps the names and levels of the game it shows)
+const playMode=()=>mode()==='review'?PLAY_MODE:mode();
+async function saveTextFile(name,text,mime){
+  try{ if(window.claude&&typeof window.claude.use==='function'){   // inside claude.ai: the viewer's own save prompt (plain downloads are blocked there)
+      const dl=await window.claude.use('downloads');
+      if(dl){ const nm=/\.(json|txt)$/i.test(name)?name:name+'.txt';   // .pgn is saved as .pgn.txt (allowed type); rename it if needed
+        try{ await dl.save({filename:nm,data:text}); }catch(e){} return; } } }catch(e){}
+  const blob=new Blob([text],{type:mime});
+  try{ const file=new File([blob],name,{type:mime});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Graffiti Chess'}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+}
+function fileStamp(){ const d=new Date(), p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes()); }   // local time   // set when a game ends by resignation, agreement or time; mate and draws are read from the board
+function sanOf(m,lm){
+  const fl='abcdefgh', sqName=i=>fl[i%8]+(Math.floor(i/8)+1), p=B[m.from], cap=!!B[m.to]||(p.t==='p'&&(m.from%8)!==(m.to%8));
+  if(p.t==='k'&&Math.abs((m.to%8)-(m.from%8))===2) return (m.to%8)===6?'O-O':'O-O-O';
+  if(p.t==='p') return (cap?fl[m.from%8]+'x':'')+sqName(m.to)+(m.promo?'='+m.promo.toUpperCase():'');
+  const rivals=lm.filter(x=>x.to===m.to&&x.from!==m.from&&B[x.from]&&B[x.from].t===p.t);
+  let dis=''; if(rivals.length){ const sameF=rivals.some(x=>x.from%8===m.from%8), sameR=rivals.some(x=>Math.floor(x.from/8)===Math.floor(m.from/8));
+    dis=!sameF?fl[m.from%8]:!sameR?String(Math.floor(m.from/8)+1):sqName(m.from); }
+  return p.t.toUpperCase()+dis+(cap?'x':'')+sqName(m.to);
+}
+function gameSAN(list){   // replays the game on a scratch copy of the position and writes every move in algebraic notation
+  const sv={B,TURN,CR,EP,H1,H2,HALF,HSTACK,NEXTID}, moves=list||history.map(u=>u.m), out=[];
+  try{
+    startPos();
+    const fl='abcdefgh', sqName=i=>fl[i%8]+(Math.floor(i/8)+1);
+    for(const mv of moves){
+      const lm=legalMoves(), m=lm.find(x=>x.from===mv.from&&x.to===mv.to&&(x.promo||null)===(mv.promo||null))||lm.find(x=>x.from===mv.from&&x.to===mv.to);
+      if(!m) break;
+      const p=B[m.from], cap=!!B[m.to]||(p.t==='p'&&(m.from%8)!==(m.to%8));
+      let san;
+      if(p.t==='k'&&Math.abs((m.to%8)-(m.from%8))===2) san=(m.to%8)===6?'O-O':'O-O-O';
+      else if(p.t==='p') san=(cap?fl[m.from%8]+'x':'')+sqName(m.to)+(m.promo?'='+m.promo.toUpperCase():'');
+      else{
+        const rivals=lm.filter(x=>x!==m&&x.to===m.to&&B[x.from]&&B[x.from].t===p.t&&x.from!==m.from);
+        let dis=''; if(rivals.length){ const sameF=rivals.some(x=>x.from%8===m.from%8), sameR=rivals.some(x=>Math.floor(x.from/8)===Math.floor(m.from/8));
+          dis=!sameF?fl[m.from%8]:!sameR?String(Math.floor(m.from/8)+1):sqName(m.from); }
+        san=p.t.toUpperCase()+dis+(cap?'x':'')+sqName(m.to);
+      }
+      make(m);
+      if(inCheck(TURN)) san+=legalMoves().length?'+':'#';
+      out.push(san);
+    }
+  }finally{ B=sv.B; TURN=sv.TURN; CR=sv.CR; EP=sv.EP; H1=sv.H1; H2=sv.H2; HALF=sv.HALF; HSTACK=sv.HSTACK; NEXTID=sv.NEXTID; }
+  return out;
+}
+const FIG={K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘'};
+const figSAN=san=>san.replace(/^[KQRBN]/,c=>FIG[c]).replace(/=([QRBN])/,(m,c)=>'='+FIG[c]);
+function gameResult(){
+  if(!over) return '*';
+  if(RESULT_TAG) return RESULT_TAG;
+  if(!legalCache.length&&inCheck(TURN)) return TURN==='w'?'0-1':'1-0';
+  return '1/2-1/2';
+}
+function buildPGN(){
+  const t=L(), sans=gameSAN(), d=new Date(), pad=n=>String(n).padStart(2,'0');
+  const lvName=$('level').value==='5'?t.adaptive:t.lv[+$('level').value-1];
+  const cpu=t.cpuName+' ('+lvName+')', hu=t.plName;
+  const pm=playMode(), W=pm==='cpu'?(human()==='w'?hu:cpu):hu+' 1', Bk=pm==='cpu'?(human()==='b'?hu:cpu):hu+' 2';
+  const res=gameResult(), op=curOpeningKey?openingName(curOpeningKey,'en'):null;
+  const head=[['Event','Graffiti Chess'],['Site','Graffiti Chess'],['Date',d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())],['Round','-'],['White',W],['Black',Bk],['Result',res]];
+  if(op) head.push(['Opening',op]);
+  let body='', line='';
+  sans.forEach((s2,i)=>{ const tok=(i%2===0?(i/2+1)+'. ':'')+s2+' '; if((line+tok).length>78){ body+=line.trimEnd()+'\n'; line=''; } line+=tok; });
+  line+=res; body+=line;
+  return head.map(([k,v])=>`[${k} "${v.replace(/"/g,"'")}"]`).join('\n')+'\n\n'+body+'\n';
+}
+function renderMoves(){
+  const t=L(), sans=REVIEW.active?gameSAN(REVIEW.moves):gameSAN(), cur=REVIEW.active?REVIEW.idx-1:sans.length-1, el=$('movesList'); el.innerHTML='';
+  $('movesOpen').textContent=curOpeningKey&&OPENING_ON?'📖 '+openingName(curOpeningKey,LANG):'';
+  if(!sans.length){ el.innerHTML='<div class="empty">'+t.noMoves+'</div>'; return; }
+  for(let i=0;i<sans.length;i+=2){
+    const n=document.createElement('div'); n.className='n'; n.textContent=(i/2+1)+'.'; el.appendChild(n);
+    for(const j of [i,i+1]){ const c=document.createElement('div'); c.textContent=j<sans.length?figSAN(sans[j]):''; if(j===cur) c.className='last'; el.appendChild(c); }
+  }
+  const r=REVIEW.active?((REVIEW.pgn||'').match(/\[Result "([^"]+)"\]/)||[0,'*'])[1]:gameResult(); if(r!=='*'){ const e=document.createElement('div'); e.className='empty'; e.textContent=r; el.appendChild(e); }
+  el.scrollTop=REVIEW.active?Math.max(0,(Math.floor(Math.max(0,cur)/2)-3)*22):el.scrollHeight;
+}
+async function savePGN(){
+  const r=gameResult(), opp=mode()==='cpu'?['easy','medium','hard','expert','adaptive'][+$('level').value-1]:'2p', rv=REVIEW.active&&REVIEW.pgn;
+  const txt=rv?REVIEW.pgn:buildPGN(), name=rv?'graffiti-chess-review-'+fileStamp()+'.pgn':'graffiti-chess-'+fileStamp()+'-'+opp+'-'+(r==='*'?'ongoing':r==='1/2-1/2'?'draw':r)+'.pgn';
+  await saveTextFile(name,txt,'application/x-chess-pgn');
+}
+async function copyPGN(){
+  const txt=REVIEW.active&&REVIEW.pgn?REVIEW.pgn:buildPGN(); let ok=false;
+  try{ await navigator.clipboard.writeText(txt); ok=true; }catch(e){
+    try{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch(e2){} }
+  const b=$('pgnCopy'), old=b.textContent; b.textContent=ok?L().pgnCopied:'—'; setTimeout(()=>{ b.textContent=L().pgnCopy; },1500);
+}
+// ---- review mode: the game is shown with the Symbols set from the top view, moving forwards and backwards through the moves ----
+const REVIEW={active:false,moves:[],idx:0,prevStyle:null,prevBoard:null,msg:'',fen:null,pgn:null};
+function setupFEN(fen){   // places the pieces of a FEN position (false if it is not readable)
+  const f=String(fen||'').trim().split(/\s+/); if(f.length<2) return false;
+  const rows=f[0].split('/'); if(rows.length!==8) return false;
+  const nb=new Array(64).fill(null); let id=1;
+  for(let r=0;r<8;r++){ let c=0; for(const ch of rows[r]){ if(/\d/.test(ch)){ c+=+ch; continue; } const t=ch.toLowerCase(); if(!'pnbrqk'.includes(t)||c>7) return false; nb[(7-r)*8+c]={c:ch===t?'b':'w',t,id:id++}; c++; } if(c!==8) return false; }
+  if(nb.filter(p=>p&&p.t==='k'&&p.c==='w').length!==1||nb.filter(p=>p&&p.t==='k'&&p.c==='b').length!==1) return false;
+  B=nb; NEXTID=id; TURN=f[1]==='b'?'b':'w'; const cr=f[2]||'-'; CR={wK:cr.includes('K'),wQ:cr.includes('Q'),bK:cr.includes('k'),bQ:cr.includes('q')};
+  if(nb.some((p,i)=>p&&p.t==='p'&&(i<8||i>=56))) return false;                     // no pawns on the first or last rank
+  const at=(i,c,t)=>nb[i]&&nb[i].c===c&&nb[i].t===t;                                  // castling rights only with king and rook at home
+  if(!at(4,'w','k')){ CR.wK=CR.wQ=false; } if(!at(7,'w','r')) CR.wK=false; if(!at(0,'w','r')) CR.wQ=false;
+  if(!at(60,'b','k')){ CR.bK=CR.bQ=false; } if(!at(63,'b','r')) CR.bK=false; if(!at(56,'b','r')) CR.bQ=false;
+  let ep=(f[3]&&/^[a-h][36]$/.test(f[3]))?(f[3].charCodeAt(0)-97)+(+f[3][1]-1)*8:null;   // en passant square must make sense
+  if(ep!==null){ const r=ep>>3, pawnSq=TURN==='w'?ep-8:ep+8; if((TURN==='w'?r!==5:r!==2)||!at(pawnSq,TURN==='w'?'b':'w','p')||nb[ep]) ep=null; }
+  EP=ep; HALF=+f[4]||0; HSTACK=[]; computeHash();
+  if(inCheck(TURN==='w'?'b':'w')) return false;                                       // the side not to move cannot be in check
+  return true;
+}
+function startPos(){ if(REVIEW.active&&REVIEW.fen&&setupFEN(REVIEW.fen)) return; resetBoard(); }
+function reviewStatus(){
+  const t=L(), N=REVIEW.moves.length, i=REVIEW.idx;
+  if(REVIEW.msg) return '<b>'+REVIEW.msg+'</b>';
+  if(!N) return t.revHint;
+  if(!i) return '<b>'+t.revStart+'</b> · 0/'+N;
+  const sans=gameSAN(); return '<b>'+(Math.ceil(i/2))+(i%2?'. ':'… ')+figSAN(sans[i-1]||'')+'</b> · '+i+'/'+N;
+}
+function placeReviewBar(){ const bar=$('reviewBar'); if(bar.hidden) return; const t=$('toolbar').getBoundingClientRect(); bar.style.bottom=(innerHeight-t.top+8)+'px'; }
+function renderReview(){
+  gameToken++; busy=false; thinking=false; selected=null; clearMarks();
+  startPos(); history=[]; curOpeningKey=null; curOpeningOld=false;
+  for(let k=0;k<REVIEW.idx;k++){ const mv=REVIEW.moves[k]; const m=legalMoves().find(x=>x.from===mv.from&&x.to===mv.to&&(x.promo||null)===(mv.promo||null)); if(!m){ REVIEW.idx=k; break; } history.push(make(m));
+    const k2=H1+':'+H2; if(openingName(k2,LANG)){ curOpeningKey=k2; curOpeningOld=false; } else if(curOpeningKey) curOpeningOld=true; }   // the opening name follows the reviewed position
+  const lu=history[history.length-1]; lastMove=lu?{from:lu.m.from,to:lu.m.to}:null;
+  over=true; legalCache=[]; syncVisuals(); showLast(); showThreats(); try{ updateOpening(); }catch(e){}
+  $('revInfo').textContent=REVIEW.idx+' / '+REVIEW.moves.length; setStatus(reviewStatus());
+  $('revFirst').disabled=$('revPrev').disabled=REVIEW.idx===0; $('revNext').disabled=$('revLast').disabled=REVIEW.idx>=REVIEW.moves.length;
+}
+function reviewGo(i){ REVIEW.msg=''; REVIEW.idx=Math.max(0,Math.min(REVIEW.moves.length,i)); if(REVIEW.idx>0&&i===REVIEW.idx&&i>0) SFX.play('glide'); renderReview(); }
+function enterReview(){
+  if(REVIEW.active) return; REVIEW.active=true; REVIEW.msg='';
+  REVIEW.pgn=history.length?buildPGN():null;   // the game being reviewed, ready to be copied or saved as it is
+  REVIEW.fen=null; REVIEW.moves=history.map(u=>({from:u.m.from,to:u.m.to,promo:u.m.promo||null})); REVIEW.idx=REVIEW.moves.length;   // starts with the game just played
+  setPaused(false); CLK.running=false; $('drawOv').hidden=true; $('banner').style.display='none';
+  REVIEW.prevStyle=PIECE_STYLE; REVIEW.prevBoard=$('boardSel').value;
+  if($('boardSel').value!=='auto'){ $('boardSel').value='auto'; $('boardSel').onchange(); }
+  if(PIECE_STYLE!=='symbols'){ $('pieceSel').value='symbols'; $('pieceSel').onchange(); }
+  ['level','side','clockSel','flipSel','pieceSel','undoBtn','hintBtn','resignBtn','drawBtn'].forEach(id=>{ const e=document.getElementById(id); if(e) e.disabled=true; });
+  $('reviewBar').hidden=false; requestAnimationFrame(placeReviewBar); renderReview();
+}
+function exitReview(){
+  if(!REVIEW.active) return; REVIEW.active=false; $('reviewBar').hidden=true;
+  ['pieceSel','undoBtn','hintBtn','resignBtn','drawBtn'].forEach(id=>{ const e=document.getElementById(id); if(e) e.disabled=false; });
+  if(REVIEW.prevStyle&&REVIEW.prevStyle!==PIECE_STYLE){ $('pieceSel').value=REVIEW.prevStyle; $('pieceSel').onchange(); }
+  if(REVIEW.prevBoard&&REVIEW.prevBoard!==$('boardSel').value){ $('boardSel').value=REVIEW.prevBoard; $('boardSel').onchange(); }
+  over=false; RESULT_TAG=null; selected=null; clearMarks();   // the review left the board 'finished': the saved game decides again
+  const want=mode(); restoreGame(); $('mode').value=want;   // back to the saved game, in the mode just chosen
+}
+function parsePGN(txt){   // first game of the file -> list of moves (SAN matched against the legal moves)
+  txt=String(txt).replace(/^\uFEFF/,'').replace(/\r/g,'');
+  const game=txt.split(/\n\s*\n(?=\[)/)[0], fm=game.match(/\[FEN\s+"([^"]+)"\]/i), fen=fm?fm[1]:null;
+  const body=game.replace(/\[[^\]]*\]/g,' ').replace(/\{[^}]*\}/g,' ').replace(/;[^\n]*/g,' ');
+  let b2=body, prev; do{ prev=b2; b2=b2.replace(/\([^()]*\)/g,' '); }while(b2!==prev);
+  const toks=b2.replace(/\$\d+/g,' ').replace(/\d+\.(\.\.)?/g,' ').split(/\s+/).filter(x=>x&&!/^(1-0|0-1|1\/2-1\/2|\*)$/.test(x));
+  const norm=x=>x.replace(/[+#!?]/g,'').replace(/^0-0-0$/,'O-O-O').replace(/^0-0$/,'O-O').replace(/=/,'').replace(/x/g,'');
+  const sv={B,TURN,CR,EP,H1,H2,HALF,HSTACK,NEXTID}, out=[]; let ok=true;
+  try{ if(fen){ if(!setupFEN(fen)) return {moves:[],ok:false,fen}; } else resetBoard();
+    for(const tk of toks){ const lm=legalMoves(); const m=lm.find(x=>norm(sanOf(x,lm))===norm(tk))||lm.find(x=>{ const a=norm(sanOf(x,lm)), b3=norm(tk); return a.length>2&&b3.length>a.length&&b3.replace(/^([KQRBN])[a-h1-8]{1,2}/,'$1')===a.replace(/^([KQRBN])[a-h1-8]{0,2}(?=[a-h][1-8])/,'$1'); });
+      if(!m){ ok=false; break; } out.push({from:m.from,to:m.to,promo:m.promo||null}); make(m); }
+  }finally{ B=sv.B; TURN=sv.TURN; CR=sv.CR; EP=sv.EP; H1=sv.H1; H2=sv.H2; HALF=sv.HALF; HSTACK=sv.HSTACK; NEXTID=sv.NEXTID; }
+  return {moves:out,ok:ok&&out.length>0,fen};
+}
 function endByAgreement(text,res,sound){
-  over=true; CLK.running=false; setPaused(false); $('drawOv').hidden=true; clearMarks(); showThreats();
+  over=true; END_TXT=text; CLK.running=false; setPaused(false); $('drawOv').hidden=true; clearMarks(); showThreats();
   setStatus('<b>'+text+'</b>'); updateClockUI(); SFX.play(sound); saveGame(); recordResult(res); setTimeout(()=>banner(text),400);
 }
 function armButton(btn,act){   // first tap arms the button, a second tap within 3 s confirms
@@ -2742,10 +3017,10 @@ function armButton(btn,act){   // first tap arms the button, a second tap within
   btn.classList.add('armed'); btn.textContent=L().confirm;
   clearTimeout(btn._t); btn._t=setTimeout(()=>{ btn.classList.remove('armed'); applyLang(); },3000);
 }
-function canAgree(){ return started&&!over&&!busy&&!marching&&history.length>0; }
+function canAgree(){ return !REVIEW.active&&started&&!over&&!busy&&!marching&&history.length>0; }
 function doResign(){
   if(!canAgree()) return;
-  const loser=mode()==='cpu'?human():TURN;
+  const loser=mode()==='cpu'?human():TURN; RESULT_TAG=loser==='w'?'0-1':'1-0';
   endByAgreement(L().resigns(colorName(loser)),mode()==='cpu'?'l':null,'mate');
 }
 function doOfferDraw(){
@@ -2753,16 +3028,17 @@ function doOfferDraw(){
   if(mode()==='pvp'){ $('drawMsg').textContent=L().drawOffered(colorName(TURN)); $('drawOv').hidden=false; return; }
   // the computer accepts only when it is not ahead in material and the game has gone on a while
   const cpu=opp(human()); let m=0; for(let i=0;i<64;i++){ const p=B[i]; if(p&&p.t!=='k') m+=(p.c===cpu?1:-1)*VAL[p.t]; }
-  if(m<=0&&history.length>=20) endByAgreement(L().drawAgreed,'d','draw');
+  if(m<=0&&history.length>=20){ RESULT_TAG='1/2-1/2'; endByAgreement(L().drawAgreed,'d','draw'); }
   else { setStatus('<b>'+L().cpuDeclines+'</b>'); setTimeout(()=>{ if(!over) updateStatus(); },2200); }
 }
 function saveGame(){
-  try{ localStorage.setItem('gc-save',JSON.stringify({v:1,moves:history.map(u=>[u.m.from,u.m.to,u.m.promo||'']),mode:mode(),side:human(),level:$('level').value,clockSel:$('clockSel').value,clk:CLK.on?{w:CLK.w,b:CLK.b,running:CLK.running,flag:over&&CLK.on&&(CLK.w<=0||CLK.b<=0)}:null})); }catch(e){}
+  if(REVIEW.active) return;   // reviewing never overwrites the saved game
+  try{ localStorage.setItem('gc-save',JSON.stringify({v:1,moves:history.map(u=>[u.m.from,u.m.to,u.m.promo||'']),mode:mode(),side:human(),level:$('level').value,clockSel:$('clockSel').value,clk:CLK.on?{w:CLK.w,b:CLK.b,running:CLK.running,flag:over&&CLK.on&&(CLK.w<=0||CLK.b<=0)}:null,end:over&&END_TXT?{txt:END_TXT,tag:RESULT_TAG}:null,ranked:GAME_RANKED,hint:HINT_USED})); }catch(e){}
 }
 function restoreGame(){
   let d=null; try{ d=JSON.parse(localStorage.getItem('gc-save')||'null'); }catch(e){}
   if(!d||d.v!==1||!Array.isArray(d.moves)){ newGame(); return; }
-  if(d.mode) $('mode').value=d.mode; if(d.side) $('side').value=d.side; if(d.level) $('level').value=d.level; if(d.clockSel) $('clockSel').value=d.clockSel;
+  if(d.mode){ $('mode').value=d.mode; if(d.mode!=='review') PLAY_MODE=d.mode; } if(d.side) $('side').value=d.side; if(d.level) $('level').value=d.level; if(d.clockSel) $('clockSel').value=d.clockSel;
   $('level').disabled=$('side').disabled=mode()!=='cpu'; $('clockSel').disabled=mode()!=='pvp'; $('flipSel').disabled=mode()!=='pvp';   // also after a saved two-player game is restored
   resetBoard(); history=[];
   for(const [f,t,pr] of d.moves){
@@ -2774,6 +3050,8 @@ function restoreGame(){
   setFlip(mode()==='cpu'&&human()==='b');
   resetClock(); if(CLK.on&&d.clk){ CLK.w=d.clk.w; CLK.b=d.clk.b; CLK.running=!!d.clk.running; CLK.lastTick=performance.now();
     if(d.clk.flag){ updateClockUI(); clockFlag(); return; } updateClockUI(); }
+  GAME_RANKED=d.ranked!==false; HINT_USED=!!d.hint;
+  if(d.end&&d.end.txt){ over=true; END_TXT=d.end.txt; RESULT_TAG=d.end.tag||null; setStatus('<b>'+END_TXT+'</b>'); updateCaps(); setTimeout(()=>banner(END_TXT),600); return; }   // resigned or agreed draw
   if(!legalCache.length){ over=true; const mate=inCheck(TURN), w=colorName(opp(TURN)); setStatus(mate?L().mateWins(w):'<b>'+L().stale+'</b>'); updateCaps();
     setTimeout(()=>banner(mate?(mode()==='cpu'?(TURN!==human()?L().win:L().lose):L().wins(w)):L().stale),600); return; }
   const dr=drawReason(); if(dr){ over=true; setStatus('<b>'+dr+'</b>'); updateCaps(); setTimeout(()=>banner(dr),600); return; }
@@ -2912,7 +3190,7 @@ function choosePromo(col){
   });
 }
 function onSquare(sq){
-  if(exploring||CLK.paused) return;
+  if(REVIEW.active||exploring||CLK.paused) return;
   if(!started||marching||busy||over||thinking||picking) return;
   if(mode()==='cpu'&&TURN!==human()) return;
   hideHint();
@@ -2966,21 +3244,20 @@ setTimeout(hideHint,9000);
 
 $('resignBtn').onclick=e=>{ e.stopPropagation(); armButton($('resignBtn'),doResign); };
 $('drawBtn').onclick=e=>{ e.stopPropagation(); armButton($('drawBtn'),doOfferDraw); };
-$('drawYes').onclick=()=>endByAgreement(L().drawAgreed,null,'draw'); $('drawNo').onclick=()=>{ $('drawOv').hidden=true; };
+$('drawYes').onclick=()=>{ RESULT_TAG='1/2-1/2'; endByAgreement(L().drawAgreed,null,'draw'); }; $('drawNo').onclick=()=>{ $('drawOv').hidden=true; };
 // ---- move statistics, adaptive level and learning to another device: export to a small JSON file, import it there ----
 function flash(msg){ setStatus('<b>'+msg+'</b>'); setTimeout(()=>{ if(!over) updateStatus(); },2600); }
 async function exportData(){
   const data={app:'graffiti-chess',v:1,date:new Date().toISOString(),stats:STATS,adapt:ADAPT,learn:LEARN};
-  const name='graffiti-chess-'+new Date().toISOString().slice(0,10)+'.json', blob=new Blob([JSON.stringify(data)],{type:'application/json'});
-  try{ const file=new File([blob],name,{type:'application/json'});   // on phones, the share sheet is the easiest way to send it to another device
-    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Graffiti Chess'}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  const name='graffiti-chess-stats-'+fileStamp()+'.json';
+  await saveTextFile(name,JSON.stringify(data),'application/json');
 }
 function importData(file){
   const rd=new FileReader();
   rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
       if(!d||d.app!=='graffiti-chess'||typeof d.stats!=='object'||!(d.adapt>=1&&d.adapt<=4)||!d.learn||typeof d.learn.bad!=='object'||typeof d.learn.crit!=='object') throw 0;
-      STATS={}; for(const lv of ['1','2','3','4','5']){ const r=d.stats[lv]; if(r) STATS[lv]={w:+r.w||0,l:+r.l||0,d:+r.d||0}; }
+      const wld=r=>({w:+r.w||0,l:+r.l||0,d:+r.d||0});
+      STATS={}; for(const lv of ['1','2','3','4','5']){ const r=d.stats[lv]; if(r){ STATS[lv]=wld(r); if(r.cw) STATS[lv].cw=wld(r.cw); if(r.cb) STATS[lv].cb=wld(r.cb); } }
       ADAPT=+d.adapt; LEARN={bad:d.learn.bad,crit:d.learn.crit,order:Array.isArray(d.learn.order)?d.learn.order.slice(-600):[]};
       try{ localStorage.setItem('gc-stats',JSON.stringify(STATS)); }catch(e){} saveLearn(); renderStats(); flash(L().impOk);
     }catch(e){ flash(L().impErr); } };
@@ -2989,6 +3266,20 @@ function importData(file){
 $('infoBtn').onclick=e=>{ e.stopPropagation(); setMenu(false); $('infoOv').hidden=false; };
 $('infoClose').onclick=()=>{ $('infoOv').hidden=true; };
 $('infoOv').onclick=e=>{ if(e.target.id==='infoOv') $('infoOv').hidden=true; };
+$('revFirst').onclick=()=>reviewGo(0); $('revPrev').onclick=()=>reviewGo(REVIEW.idx-1); $('revNext').onclick=()=>reviewGo(REVIEW.idx+1); $('revLast').onclick=()=>reviewGo(REVIEW.moves.length);
+$('revLoad').onclick=()=>{ $('pgnFile').value=''; $('pgnFile').click(); };
+$('pgnFile').onchange=()=>{ const f=$('pgnFile').files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ const r=parsePGN(String(rd.result)); if(r.moves.length){ REVIEW.pgn=String(rd.result).replace(/^\uFEFF/,'').replace(/\r/g,'').split(/\n\s*\n(?=\[)/)[0].trim()+'\n'; REVIEW.fen=r.fen; REVIEW.moves=r.moves; REVIEW.idx=0; REVIEW.msg=r.ok?'':L().revErr; renderReview(); } else { REVIEW.msg=L().revErr; setStatus(reviewStatus()); } };
+  rd.readAsText(f); };
+document.addEventListener('keydown',e=>{ if(!REVIEW.active||/INPUT|SELECT|TEXTAREA/.test((e.target&&e.target.tagName)||'')) return;
+  if(e.key==='ArrowRight') reviewGo(REVIEW.idx+1); else if(e.key==='ArrowLeft') reviewGo(REVIEW.idx-1); else if(e.key==='Home') reviewGo(0); else if(e.key==='End') reviewGo(REVIEW.moves.length); });
+window.addEventListener('resize',()=>placeReviewBar());
+$('movesBtn').onclick=e=>{ e.stopPropagation(); setMenu(false); renderMoves(); $('movesOv').hidden=false; };
+$('movesClose').onclick=()=>{ $('movesOv').hidden=true; };
+$('movesBack').onclick=e=>{ e.stopPropagation(); $('movesOv').hidden=true; setMenu(true); };
+$('movesOv').onclick=e=>{ if(e.target.id==='movesOv') $('movesOv').hidden=true; };
+$('pgnCopy').onclick=e=>{ e.stopPropagation(); copyPGN(); };
+$('pgnSave').onclick=e=>{ e.stopPropagation(); savePGN(); };
 $('statsBtn').onclick=e=>{ e.stopPropagation(); setMenu(false); renderStats(); $('statsOv').hidden=false; };
 $('statsClose').onclick=()=>{ $('statsOv').hidden=true; };
 $('statsBack').onclick=e=>{ e.stopPropagation(); $('statsOv').hidden=true; setMenu(true); };
@@ -3017,8 +3308,10 @@ $('statsReset').onclick=e=>{ e.stopPropagation(); STATS={}; ADAPT=2; LEARN={bad:
 (function groupMenu(){   // functional settings first, appearance second
   const mp=$('menuPanel'), lab=id=>$(id).closest('label'), anchor=$('statsBtn').closest('.row2');
   const h=(id)=>{ const d=document.createElement('div'); d.className='grp'; d.id=id; return d; };
-  [h('grpGame'),lab('mode'),lab('level'),lab('flipSel'),lab('clockSel'),lab('langSel'),h('grpLook'),lab('side'),lab('pieceSel'),lab('boardSel'),lab('threatSel'),lab('shadowSel')].forEach(el=>mp.insertBefore(el,anchor));
+  [h('grpGame'),lab('mode'),lab('level'),lab('flipSel'),lab('clockSel'),lab('langSel'),h('grpLook'),lab('side'),lab('pieceSel'),lab('boardSel'),lab('threatSel'),lab('openSel'),lab('shadowSel')].forEach(el=>mp.insertBefore(el,anchor));
 })();
+$('openSel').value=OPENING_ON?'1':'0';
+$('openSel').onchange=()=>{ OPENING_ON=$('openSel').value==='1'; try{ localStorage.setItem('gc-opening',OPENING_ON?'1':'0'); }catch(e){} updateOpening(); };
 $('flipSel').value=AUTO_FLIP?'1':'0'; $('flipSel').disabled=mode()!=='pvp';
 $('flipSel').onchange=()=>{ AUTO_FLIP=$('flipSel').value==='1'; try{ localStorage.setItem('gc-autoflip',AUTO_FLIP?'1':'0'); }catch(e){} if(AUTO_FLIP) autoFlip(); else if(mode()==='pvp') setFlip(false); };
 $('pieceSel').value=PIECE_STYLE;
@@ -3030,28 +3323,34 @@ $('pieceSel').onchange=()=>{ if(busy||marching){ $('pieceSel').value=PIECE_STYLE
   syncVisuals(); showLast(); showThreats(); };
 $('threatSel').value=THREATS_ON?'1':'0'; $('threatSel').onchange=()=>{ THREATS_ON=$('threatSel').value==='1'; try{ localStorage.setItem('gc-threats',THREATS_ON?'1':'0'); }catch(e){} showThreats(); };
 $('newBtn').onclick=()=>newGame(true); $('againBtn').onclick=()=>newGame(true);
+$('saveGameBtn').onclick=e=>{ e.stopPropagation(); savePGN(); };   // save the finished game straight from the end banner
+$('revGameBtn').onclick=()=>{ $('banner').style.display='none'; $('mode').value='review'; $('mode').onchange(); };   // review the game just finished
 $('mode').addEventListener('change',()=>saveGame());
-$('mode').onchange=()=>{ const c=mode()==='cpu'; $('level').disabled=!c; $('side').disabled=!c; $('clockSel').disabled=c; $('flipSel').disabled=c; if(c) setFlip(human()==='b'); resetClock(); if(CLK.on&&history.length){ CLK.running=true; CLK.lastTick=performance.now(); } updateStatus(); if(!busy) maybeAI(); };
+$('mode').onchange=()=>{ if(mode()==='review'){ enterReview(); return; } const fromRev=REVIEW.active, prevPlay=PLAY_MODE; PLAY_MODE=mode(); if(fromRev) exitReview();
+  if(!fromRev||mode()!==prevPlay) unrank(); const c=mode()==='cpu'; $('level').disabled=!c; $('side').disabled=!c; $('clockSel').disabled=c; $('flipSel').disabled=c; if(c) setFlip(human()==='b'); resetClock(); if(CLK.on&&history.length){ CLK.running=true; CLK.lastTick=performance.now(); } updateStatus(); if(!busy) maybeAI(); };
 $('shadowSel').value=SHADOWS_ON?'1':'0';
 $('shadowSel').onchange=()=>{ SHADOWS_ON=$('shadowSel').value==='1'; try{ localStorage.setItem('gc-shadows',SHADOWS_ON?'1':'0'); }catch(e){} applyShadows(); };
 $('pauseBtn').onclick=()=>{ if(CLK.on&&CLK.running&&!over) setPaused(true); };
 $('resumeBtn').onclick=()=>setPaused(false);
 $('clockSel').onchange=()=>{ resetClock(); if(CLK.on&&history.length){ CLK.running=true; CLK.lastTick=performance.now(); } updateClockUI(); saveGame(); };
 $('side').addEventListener('change',()=>saveGame());
-$('level').addEventListener('change',()=>saveGame());
+$('level').addEventListener('change',()=>{ if(mode()==='cpu') unrank(); saveGame(); });
 let prevSide=$('side').value;
 $('side').onchange=()=>{
-  if(marching){ $('side').value=prevSide; return; } prevSide=$('side').value;
+  if(marching){ $('side').value=prevSide; return; } prevSide=$('side').value; if(mode()==='cpu') unrank();
   aiToken++; thinking=false; selected=null; clearMarks();
   if(mode()==='cpu') setFlip(human()==='b');
   if(!busy&&!over){ updateStatus(); maybeAI(); }
 };
 $('undoBtn').onclick=()=>{
-  if(busy||thinking||marching||!history.length) return;
+  if(REVIEW.active||busy||thinking||marching||!history.length) return;
   if(CLK.on&&!over) return;   // no take-backs in a timed game
+  if(mode()==='cpu'&&over) return;   // against the computer a finished game is final
   SFX.cancelPending();
+  if(mode()==='cpu') unrank();
   do{unmake(history.pop());} while(mode()==='cpu'&&TURN!==human()&&history.length);
-  gameToken++; over=false; hideBanner(); selected=null; clearMarks();
+  if(!history.length&&!HINT_USED) GAME_RANKED=true;   // back at the starting position: a fresh game (unless help was asked)
+  gameToken++; over=false; RESULT_TAG=null; END_TXT=null; hideBanner(); selected=null; clearMarks();   // a take-back after the end reopens the game: its old result no longer applies
   const lu=history[history.length-1]; lastMove=lu?{from:lu.m.from,to:lu.m.to}:null; showLast();
   syncVisuals(); legalCache=legalMoves(); clearCelebration(); saveGame(); updateStatus(); maybeAI();
 };
@@ -3086,12 +3385,13 @@ renderer.domElement.addEventListener('pointerdown',e=>{ if(exploring) drag={x:e.
 window.addEventListener('pointermove',e=>{ if(exploring&&drag){ camAngle=drag.a-(e.clientX-drag.x)/app.clientWidth*Math.PI*1.6; placeCamera(); } });
 window.addEventListener('pointerup',()=>{ drag=null; });
 $('langSel').value=LANG;
-$('langSel').onchange=()=>{ LANG=$('langSel').value; try{ localStorage.setItem('gc-lang',LANG); }catch(e){} applyLang(); setTopLabel(); syncFakeSelects(); requestAnimationFrame(fitMenu); syncMute(); if(!over) updateStatus(); };
+$('langSel').onchange=()=>{ LANG=$('langSel').value; setTimeout(()=>{ try{ updateOpening(); }catch(e){} },0); try{ localStorage.setItem('gc-lang',LANG); }catch(e){} applyLang(); setTopLabel(); syncFakeSelects(); requestAnimationFrame(fitMenu); syncMute(); if(!over) updateStatus(); };
 const sqName=i=>'abcdefgh'[i&7]+((i>>3)+1);
 let hinting=false;
 $('hintBtn').onclick=async()=>{
   if(busy||thinking||over||picking||hinting||marching) return;
   if(mode()==='cpu'&&TURN!==human()) return;
+  if(mode()==='cpu'){ HINT_USED=true; if(history.length) unrank(); else { GAME_RANKED=false; saveGame(); updateStatus(); } }   // asking for help: the game no longer counts
   hinting=true; setStatus(L().search); const tok=gameToken, mv=history.length;
   const r=await computeMove(3); hinting=false;
   if(tok!==gameToken||mv!==history.length||!r){ updateStatus(); return; }
@@ -3218,6 +3518,7 @@ document.addEventListener('pointerdown',armBackGuard,true);
 window.addEventListener('popstate',()=>{
   backGuard=false;
   if(!$('pickOv').hidden) $('pickOv').hidden=true;
+  else if(!$('movesOv').hidden){ $('movesOv').hidden=true; setMenu(true); }
   else if(!$('statsOv').hidden){ $('statsOv').hidden=true; setMenu(true); }
   else if(!$('infoOv').hidden){ $('infoOv').hidden=true; setMenu(true); }
   else if(!$('menuPanel').hidden) setMenu(false);
@@ -3231,13 +3532,16 @@ window.addEventListener('popstate',()=>{
 /* ---------- loop ---------- */
 const clock=new T.Clock();
 function loop(){
+  { const ub=$('undoBtn'), ud=REVIEW.active||(mode()==='cpu'&&over); if(ub.disabled!==ud) ub.disabled=ud; }   // Undo greyed out when it cannot be used
+  { let sig=''; for(const sel of document.querySelectorAll('#menuPanel select')) sig+=sel.value+(sel.disabled?'!':'')+(sel.options[0]?sel.options[0].textContent[0]:'')+'|';   // the menu buttons always show the real settings,
+    if(sig!==loop._sig){ loop._sig=sig; try{ syncFakeSelects(); }catch(e){} } }                                                                          // even when the game changes them by itself
   { const tv=true; const fd=new T.Vector3(); camera.getWorldDirection(fd);
-    const viewA=camAngle, facing=mode()==='cpu'||AUTO_FLIP;   // orbit angle: stable when zooming in the top view
+    const viewA=camAngle, facing=mode()==='cpu'||AUTO_FLIP||REVIEW.active;   // in review all symbols stay upright for the viewer   // orbit angle: stable when zooming in the top view
     for(let i=GLYPHS.length-1;i>=0;i--){ const gl=GLYPHS[i]; if(!gl.parent||!gl.parent.parent||!gl.parent.parent.parent){ GLYPHS.splice(i,1); continue; } gl.visible=tv;
       if(!tv) continue; const rig=gl.parent, G=rig.parent, phi=G.rotation.y+rig.rotation.y;
       const want=facing?viewA:(TURN==='w'?0:Math.PI);   // two players without 'turn board': all tiles face the player to move
       const tgt=want-phi, cur=gl.userData.za!==undefined?gl.userData.za:tgt, d=Math.atan2(Math.sin(tgt-cur),Math.cos(tgt-cur));
-      gl.userData.za=cur+d*Math.min(1,.18); gl.rotation.set(-Math.PI/2,0,gl.userData.za); } }
+      gl.userData.za=facing?tgt:cur+d*Math.min(1,.18); gl.rotation.set(-Math.PI/2,0,gl.userData.za); } }   // facing the viewer: follow the camera exactly (it animates itself); turn-based: a short smooth turn
   clockTick(performance.now());
   const dt=Math.min(clock.getDelta(),.05), tm=clock.elapsedTime;
   for(const G of meshes.values()){
@@ -3258,6 +3562,7 @@ function loop(){
   }
   for(const G of meshes.values()){
     const u=G.userData; if(u.busy) continue;
+    if(u.classic) continue;   // wooden/steel pieces and tiles are objects: no breathing, and their own proportions are kept
     u.rig.scale.set(u.S,u.S*(1+Math.sin(tm*2.2+u.phase)*.025),u.S);
     u.armO.rotation.x=Math.sin(tm*1.6+u.phase)*.08;
   }
