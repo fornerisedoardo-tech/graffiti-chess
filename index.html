@@ -93,6 +93,7 @@ select.hiddenSel{display:none!important}
 #infoOv .ih{font-family:"Permanent Marker",cursive;font-size:22px;color:var(--yellow);margin-bottom:8px}
 #infoOv ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.45}
 #infoOv li{margin:0 0 6px}
+#appVer{font-size:11px;color:var(--muted);text-align:right;margin:-6px 0 8px;opacity:.7}
 #infoOv .vic{display:inline-block;width:18px;height:18px;vertical-align:-4px;margin:0 3px 0 1px;color:var(--yellow)}#infoOv .vic svg{width:18px;height:18px}
 #infoOv .ovBtns button{width:auto}
 .ovBtns{display:flex;gap:8px;margin-top:10px}.ovBtns button{flex:1}
@@ -165,6 +166,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 #promo .pgrid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;background:var(--panel)}
 #promo .pgrid button:hover{border-color:var(--yellow)}
 #promo img{width:100%;max-width:80px;aspect-ratio:4/5;object-fit:contain}
+#hint[hidden]{display:none!important}
 #hint{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;transition:opacity .6s;pointer-events:none;white-space:nowrap}
 #loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"Permanent Marker",cursive;font-size:28px;color:var(--muted)}
 @media (max-width:640px){ #hud{padding:8px} .card{padding:8px 10px} button,select{padding:6px 8px;font-size:12px} #toolbar{bottom:8px} label.tilt input{width:72px} #toolbar .lbl{display:none} #toolbar button{min-width:38px;font-size:15px} #topBtn{font-size:12px!important} }
@@ -258,7 +260,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v233</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -268,7 +270,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
     <div class="pgrid" id="promoGrid"></div>
     <button id="promoCancel">Cancel</button>
   </div>
-  <div id="hint">Tap one of your pieces to see where it can go</div>
+  <div id="hint" hidden></div>
 </div>
 
 <script>/**
@@ -3603,7 +3605,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{ const ld=document.getEleme
 </script>
 <script>
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}));
 }
 </script>
 </body>
