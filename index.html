@@ -93,6 +93,7 @@ select.hiddenSel{display:none!important}
 #infoOv .ih{font-family:"Permanent Marker",cursive;font-size:22px;color:var(--yellow);margin-bottom:8px}
 #infoOv ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.45}
 #infoOv li{margin:0 0 6px}
+#infoOv .vic{display:inline-block;width:18px;height:18px;vertical-align:-4px;margin:0 3px 0 1px;color:var(--yellow)}#infoOv .vic svg{width:18px;height:18px}
 #infoOv .ovBtns button{width:auto}
 .ovBtns{display:flex;gap:8px;margin-top:10px}.ovBtns button{flex:1}
 #drawOv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,16,.45);z-index:7}
@@ -144,9 +145,13 @@ label.tilt span.tv{font-size:13px;min-width:2.6em;font-variant-numeric:tabular-n
 #pauseOv[hidden]{display:none}
 #pauseOv .card{text-align:center;padding:22px 30px}
 #pauseOv .big{font-family:"Permanent Marker",cursive;font-size:clamp(34px,7vw,56px);color:var(--yellow);-webkit-text-stroke:2px #111;text-shadow:4px 4px 0 var(--pink);margin-bottom:12px}
-#topBtn .seg{opacity:.45;padding:0 2px}
-#topBtn .seg.on{opacity:1;color:var(--yellow);font-weight:700}
-#topBtn .sep{opacity:.35;margin:0 3px}
+#topBtn{display:inline-flex;align-items:center;gap:4px}
+#topBtn .seg{display:inline-flex;align-items:center;justify-content:center;width:30px;height:24px;border-radius:7px;border:1.5px solid transparent;opacity:.5}
+#topBtn .seg svg{width:20px;height:20px;display:block}
+#topBtn .seg.on{opacity:1;color:var(--yellow);border-color:var(--yellow);box-shadow:0 0 6px rgba(255,210,63,.45)}
+#topBtn .sep{display:none}
+.row21{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.row21 button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 #rotateMsg{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:var(--bg);z-index:20;text-align:center;font-size:16px;color:var(--ink)}
 #rotateMsg .card{padding:20px 26px}
 #rotateMsg .ico{font-size:40px;margin-bottom:8px}
@@ -181,23 +186,24 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
       <div id="menuPanel" class="menu" hidden>
         <button class="primary" id="newBtn">New game</button>
         <div class="row2"><button id="resignBtn">Resign</button><button id="drawBtn">Offer draw</button></div>
-        <label>Mode<select id="mode">
+        <button id="movesBtn">📜 Moves</button>
+        <label>Mode<select autocomplete="off" id="mode">
           <option value="cpu">vs Computer</option>
           <option value="pvp">Two players</option>
           <option value="review">Review game</option>
         </select></label>
-        <label>Your colour<select id="side">
+        <label>Your colour<select autocomplete="off" id="side">
           <option value="w">White</option>
           <option value="b">Black</option>
         </select></label>
-        <label>Difficulty<select id="level">
+        <label>Difficulty<select autocomplete="off" id="level">
           <option value="1">Easy</option>
           <option value="2" selected>Medium</option>
           <option value="3">Hard</option>
           <option value="4">Expert</option>
           <option value="5">Adaptive</option>
         </select></label>
-        <label>Board<select id="boardSel">
+        <label>Board<select autocomplete="off" id="boardSel">
           <option value="auto">Default</option>
           <option value="squadre">Default</option>
           <option value="noce">Walnut</option>
@@ -213,19 +219,18 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
           <option value="acciaio">Steel</option>
           <option value="graffiti">Graffiti</option>
         </select></label>
-        <label>Auto-rotate<select id="flipSel"><option value="0">Off</option><option value="1">On</option></select></label>
-        <label>Clock<select id="clockSel">
+        <label>Auto-rotate<select autocomplete="off" id="flipSel"><option value="0">Off</option><option value="1">On</option></select></label>
+        <label>Clock<select autocomplete="off" id="clockSel">
           <option value="0+0">Off</option><option value="180+2">3 | 2</option><option value="300+0">5 min</option><option value="600+0">10 min</option><option value="900+10">15 | 10</option><option value="1800+0">30 min</option>
         </select></label>
-        <label>Pieces<select id="pieceSel"><option value="chars">Characters</option><option value="classic">Wood</option><option value="steel">Steel</option><option value="symbols">Symbols</option></select></label>
-        <label>Threats<select id="threatSel"><option value="0">Off</option><option value="1">On</option></select></label>
-        <label>Opening name<select id="openSel"><option value="0">Off</option><option value="1">On</option></select></label>
-        <label>Shadows<select id="shadowSel"><option value="1">On</option><option value="0">Off</option></select></label>
-        <label>Language<select id="langSel">
+        <label>Pieces<select autocomplete="off" id="pieceSel"><option value="chars">Characters</option><option value="classic">Wood</option><option value="steel">Steel</option><option value="symbols">Symbols</option></select></label>
+        <label>Threats<select autocomplete="off" id="threatSel"><option value="0">Off</option><option value="1">On</option></select></label>
+        <label>Opening name<select autocomplete="off" id="openSel"><option value="0">Off</option><option value="1">On</option></select></label>
+        <label>Shadows<select autocomplete="off" id="shadowSel"><option value="1">On</option><option value="0">Off</option></select></label>
+        <label>Language<select autocomplete="off" id="langSel">
           <option value="en">English</option><option value="it">Italiano</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option>
           <option value="pt">Português</option><option value="pl">Polski</option><option value="ru">Русский</option><option value="tr">Türkçe</option><option value="id">Bahasa Indonesia</option>
         </select></label>
-        <button id="movesBtn">📜 Moves</button>
         <div class="row2"><button id="statsBtn">Statistics</button><button id="infoBtn">ⓘ How to play</button></div>
       </div>
     </div>
@@ -900,8 +905,12 @@ id:{unranked:'Tidak dihitung di statistik',saveMatch:'Simpan',revMode:'Tinjau pe
 };
 let LANG='en'; try{ const l=localStorage.getItem('gc-lang'); if(l&&I18N[l]) LANG=l; }catch(e){}
 const L=()=>I18N[LANG];
+const VIEW_ICON_FRONT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l4 11H2z"/><path d="M9.3 8 8 19M14.7 8 16 19M4 13.5h16"/></svg>';
+const VIEW_ICON_TOP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17"/></svg>';
 function infoFill(x,t){   // command names come from the interface itself, in quotes, so the text always matches the buttons
-  const v={lv0:t.lv[0],lv3:t.lv[3],bc0:t.bc[0],view:t.frontS+' | '+t.topS}; return x.replace(/\{(\w+)\}/g,(m,k)=>'"'+(v[k]!==undefined?v[k]:(t[k]!==undefined?t[k]:k))+'"'); }
+  const v={lv0:t.lv[0],lv3:t.lv[3],bc0:t.bc[0]};
+  const view='<span class="vic">'+VIEW_ICON_FRONT+'</span>"'+t.frontS+'" | <span class="vic">'+VIEW_ICON_TOP+'</span>"'+t.topS+'"';   // the two icons of the toolbar, each with its name
+  return x.replace(/\{(\w+)\}/g,(m,k)=>k==='view'?view:'"'+(v[k]!==undefined?v[k]:(t[k]!==undefined?t[k]:k))+'"'); }
 function applyLang(){
   const t=L(); document.documentElement.lang=LANG;
   const set=(id,txt)=>{ const e=document.getElementById(id); if(e) e.textContent=txt; };
@@ -2983,6 +2992,7 @@ function enterReview(){
   REVIEW.prevStyle=PIECE_STYLE; REVIEW.prevBoard=$('boardSel').value;
   if($('boardSel').value!=='auto'){ $('boardSel').value='auto'; $('boardSel').onchange(); }
   if(PIECE_STYLE!=='symbols'){ $('pieceSel').value='symbols'; $('pieceSel').onchange(); }
+  try{ localStorage.setItem('gc-pieces',REVIEW.prevStyle); localStorage.setItem('gc-board',REVIEW.prevBoard); }catch(e){}   // temporary: your own pieces and board stay saved
   ['level','side','clockSel','flipSel','pieceSel','undoBtn','hintBtn','resignBtn','drawBtn'].forEach(id=>{ const e=document.getElementById(id); if(e) e.disabled=true; });
   $('reviewBar').hidden=false; requestAnimationFrame(placeReviewBar); renderReview();
 }
@@ -3429,7 +3439,8 @@ $('tilt').max=TILT_MAX; $('tilt').min=TILT_MIN;
 const curTilt=portrait=>userTilt!==null?userTilt:(portrait?58:32);
 function setTopLabel(){   // a two-way switch: both views are shown and the current one is highlighted
   const t=L(); $('topBtn').setAttribute('aria-pressed',topView); $('topBtn').title=topView?t.front:t.top;
-  $('topBtn').innerHTML=`<span class="seg${topView?'':' on'}">${t.frontS}</span><span class="sep">|</span><span class="seg${topView?' on':''}">${t.topS}</span>`; }
+  $('topBtn').setAttribute('aria-label',t.frontS+' | '+t.topS);
+  $('topBtn').innerHTML=`<span class="seg${topView?'':' on'}" title="${t.frontS}">${VIEW_ICON_FRONT}</span><span class="seg${topView?' on':''}" title="${t.topS}">${VIEW_ICON_TOP}</span>`; }
 $('tilt').addEventListener('input',()=>{
   userTilt=+$('tilt').value;
   if(zoomT>0&&userTilt<70){ userTilt=70; $('tilt').value=70; }   // while zoomed the tilt stays between 70 and 88
@@ -3584,7 +3595,9 @@ function loop(){
 }
 let started=true, marching=false;
 try{ if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('portrait').catch(()=>{}); }catch(e){}
-applyLang(); initBackdrop(); initMemorial(); initBench(); initBirds(); initGarden(); applyBoardStyle(boardChoice()); $('clockSel').disabled=mode()!=='pvp'; restoreGame(); setTopLabel(); Math.random=SYS_RANDOM; applyShadows(); loop();
+function fixStrayReview(){ if(mode()==='review'&&!REVIEW.active){ $('mode').value=PLAY_MODE==='review'?'cpu':PLAY_MODE; $('mode').onchange(); } }   // 'Review game' is never a starting mode
+window.addEventListener('pageshow',()=>setTimeout(fixStrayReview,0));
+applyLang(); initBackdrop(); initMemorial(); initBench(); initBirds(); initGarden(); applyBoardStyle(boardChoice()); $('clockSel').disabled=mode()!=='pvp'; restoreGame(); fixStrayReview(); setTopLabel(); Math.random=SYS_RANDOM; applyShadows(); loop();
 requestAnimationFrame(()=>requestAnimationFrame(()=>{ const ld=document.getElementById('loading'); if(ld) ld.remove(); }));
 })();
 </script>
