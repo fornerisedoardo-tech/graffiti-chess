@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#2a2433">
+<meta name="theme-color" content="#1f1b24">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -275,7 +275,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v251</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v252</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -3608,7 +3608,7 @@ let symPrevTilt=null;
 function applySymbolView(wasSym){
   const sym=PIECE_STYLE==='symbols';
   ['tilt','topBtn','exploreBtn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=sym; });
-  if(sym){ if(!wasSym) symPrevTilt=userTilt; userTilt=88; topView=true; setTopLabel(); layoutCamera(); }
+  if(sym){ if(!wasSym) symPrevTilt=(exploring&&preExploreTilt!==null)?preExploreTilt:userTilt; userTilt=88; topView=true; setTopLabel(); layoutCamera(); }
   else if(wasSym){ userTilt=symPrevTilt!==null?symPrevTilt:50; topView=userTilt>=70; setTopLabel(); layoutCamera(); }
 }
 // ---- threatened pieces (optional help): own pieces attacked and not defended get a red ring ----
@@ -4234,7 +4234,8 @@ function exitExplore(){
   const a0=camAngle, base=flipped?Math.PI:0; let d=((base-a0)%(Math.PI*2)+Math.PI*3)%(Math.PI*2)-Math.PI;
   const from=curTilt(camera.aspect<.8), to=preExploreTilt!==null?preExploreTilt:from;
   $('tilt').max=TILT_MAX;
-  tween(800,t=>{ const e=ease.io(t); camAngle=a0+d*e; userTilt=from+(to-from)*e; layoutCamera(); }).then(()=>{ camAngle=base; userTilt=to; layoutCamera();
+  const tgt=()=>PIECE_STYLE==='symbols'?88:to;   // symbols (also in review) are always seen from above
+  tween(800,t=>{ const e=ease.io(t); camAngle=a0+d*e; userTilt=from+(tgt()-from)*e; layoutCamera(); }).then(()=>{ camAngle=base; userTilt=tgt(); layoutCamera();
     exploring=false; document.body.classList.remove('exploring'); $('backBtn').hidden=true; topView=userTilt>=70; setTopLabel();
     if(REVIEW.active) setStatus(reviewStatus()); else if(over) setStatus(preExploreStatus); else updateStatus(); });   // a finished game shows its result again, not the 360° hint
 }
@@ -4457,6 +4458,11 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{ const ld=document.getEleme
 <script>
 // offline app: the service worker keeps a copy of the game (only when served from a web address, not from a local file)
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+// installed app: full screen, the phone's navigation bar hidden (it comes back with a swipe from the edge)
+(function(){ const inApp=matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches;
+  if(!inApp||!document.documentElement.requestFullscreen) return;
+  const go=()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); };
+  document.addEventListener('pointerup',go,{passive:true}); })();
 </script>
 </body>
 </html>

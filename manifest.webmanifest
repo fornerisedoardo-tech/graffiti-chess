@@ -5,10 +5,10 @@
   "lang": "it",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
-  "background_color": "#89837f",
-  "theme_color": "#2a2433",
+  "background_color": "#1f1b24",
+  "theme_color": "#1f1b24",
   "icons": [
     {
       "src": "icon-192.png",
@@ -26,5 +26,9 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "display_override": [
+    "fullscreen",
+    "standalone"
   ]
 }
