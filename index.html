@@ -4458,11 +4458,6 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{ const ld=document.getEleme
 <script>
 // offline app: the service worker keeps a copy of the game (only when served from a web address, not from a local file)
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-// installed app: full screen, the phone's navigation bar hidden (it comes back with a swipe from the edge)
-(function(){ const inApp=matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches;
-  if(!inApp||!document.documentElement.requestFullscreen) return;
-  const go=()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); };
-  document.addEventListener('pointerup',go,{passive:true}); })();
 </script>
 </body>
 </html>
