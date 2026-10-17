@@ -275,7 +275,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v248</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v251</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -1381,6 +1381,9 @@ const stoneTop=new T.Mesh(new T.CircleGeometry(TR,96),new T.MeshToonMaterial({ma
 stoneTop.rotation.x=-Math.PI/2; stoneTop.position.y=TY; stoneTop.receiveShadow=true; scene.add(stoneTop);
 const sideMatS=new T.MeshToonMaterial({map:sideTex,gradientMap:GRAD});
 const stoneBody=new T.Mesh(new T.CylinderGeometry(TR,TR-.12,TT,96,1,true),sideMatS); stoneBody.position.y=TY-TT/2-.005; stoneBody.castShadow=true; stoneBody.receiveShadow=true; scene.add(stoneBody);
+{ // the table top stops the sunlight: an invisible disc just under it casts the shadow, so light never passes through the top; only what overhangs the edge shadows the rim or the lawn
+  const blocker=new T.Mesh(new T.CircleGeometry(TR-.03,96),new T.MeshBasicMaterial({colorWrite:false,depthWrite:false,side:T.DoubleSide}));
+  blocker.rotation.x=-Math.PI/2; blocker.position.y=TY-.03; blocker.castShadow=true; blocker.receiveShadow=false; scene.add(blocker); }
 const stoneUnder=new T.Mesh(new T.CircleGeometry(TR-.12,64),toon('#4b4846')); stoneUnder.rotation.x=Math.PI/2; stoneUnder.position.y=TY-TT; stoneUnder.castShadow=true; scene.add(stoneUnder);
 const pedestal=new T.Mesh(new T.CylinderGeometry(1.9,2.6,8,40,1,true),sideMatS); pedestal.position.y=TY-TT-4; pedestal.castShadow=true; pedestal.receiveShadow=true; scene.add(pedestal);
 const pedBase=new T.Mesh(new T.CylinderGeometry(3.4,3.6,.8,48),[sideMatS,new T.MeshToonMaterial({map:makeStoneFootTex(),gradientMap:GRAD}),sideMatS]); pedBase.position.y=TY-TT-7.6; pedBase.castShadow=true; pedBase.receiveShadow=true; scene.add(pedBase);
