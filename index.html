@@ -275,7 +275,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v258</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v266</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -1442,7 +1442,7 @@ function makeOwl(){
   return B;
 }
 const birds=[];
-// outdoors: tufts of grass around the foot of the table and two little snails climbing the pedestal
+// outdoors: tufts of grass around the foot of the table and a little snail climbing the pedestal
 const snails=[];
 function initGarden(){
   NO_SPRAY=true;
@@ -1477,7 +1477,7 @@ function initGarden(){
   mergeStatic(grass);
   // pedestal: radius 1.9 at the top, 2.6 at the bottom, 8 tall
   const pr=y=>{ const t=(TY-TT-y)/8; return 1.9+.7*t; };
-  for(const [a,y] of [[1.05,TY-TT-3.8],[-.55,TY-TT-5.4]]){
+  for(const [a,y] of [[1.05,TY-TT-3.8]]){
     const r=pr(y)+.02, n=new T.Vector3(Math.sin(a),0,Math.cos(a)), up=new T.Vector3(0,1,0), X=new T.Vector3().crossVectors(n,up);
     const sn=new T.Group(); sn.position.set(n.x*r,y,n.z*r); sn.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(X,n,up));
     const body=new T.Group(); sn.add(body);
@@ -1490,9 +1490,71 @@ function initGarden(){
     addPart(body,new T.TorusGeometry(.12,.03,6,18),'#8a5528',0,.24,-.05,{rot:[0,Math.PI/2,0],ow:.006});
     addPart(body,Sph(.04,8,6),'#8a5528',.12,.25,-.05,{outline:false});
     stalks.forEach(st=>mergeStatic(st)); mergeStatic(body,stalks); sn.scale.setScalar(1.6); scene.add(sn);
-    snails.push({sn,body,stalks,phase:rnd(0,6.28),base:sn.position.clone(),dir:up.clone()});
+    snails.push({sn,body,stalks,phase:rnd(0,6.28),a,y0:y,n:n.clone()});
   }
   NO_SPRAY=false;
+}
+// an open book left on the bench: hard covers, a thick block of pages, printed text and a little chess diagram,
+// a red ribbon bookmark; now and then a gust lifts the top right page, which settles back down
+let BOOK3D=null;
+function bookPageTex(right){
+  const W=384, H=540, [cv,g]=canvas(W,H);
+  g.fillStyle='#f6efda'; g.fillRect(0,0,W,H);
+  const gr=right?g.createLinearGradient(0,0,60,0):g.createLinearGradient(W,0,W-60,0); gr.addColorStop(0,'rgba(120,95,60,.28)'); gr.addColorStop(1,'rgba(120,95,60,0)');
+  g.fillStyle=gr; g.fillRect(0,0,W,H);                                                             // shading in the gutter by the spine
+  const mx=right?52:40, tw=W-92; let y=58;
+  const lines=(n,y0,lh=17)=>{ for(let i=0;i<n;i++){ let x=mx; const yy=y0+i*lh, end=i===n-1?mx+tw*rnd(.3,.7):mx+tw;
+      while(x<end-8){ const w=Math.min(end-x,rnd(14,46)); g.fillStyle='rgba(60,52,44,.72)'; g.fillRect(x,yy,w,5); x+=w+7; } } return y0+n*lh; };
+  g.fillStyle='#3a3028'; g.font='bold 30px Georgia, serif'; g.textAlign='left';
+  if(!right){ g.fillText('III',mx,y+8); y+=40; g.fillStyle='#a8322a'; g.font='bold 54px Georgia, serif'; g.fillText('L',mx,y+42);
+    y=lines(3,y+6,17)+6; y=lines(9,y+8); y=lines(8,y+20); lines(5,y+20); }
+  else { // a small chess diagram, then text
+    const s=19, ox=(W-8*s)/2+6, oy=48;
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){ g.fillStyle=(r+c)%2?'#8c7a62':'#efe4c8'; g.fillRect(ox+c*s,oy+r*s,s,s); }
+    g.strokeStyle='#3a3028'; g.lineWidth=2; g.strokeRect(ox,oy,8*s,8*s);
+    for(const [c,r,w] of [[4,7,1],[6,5,1],[3,6,1],[4,0,0],[2,2,0],[5,1,0],[1,4,1]]){ g.fillStyle=w?'#fbf6ea':'#2a2420'; g.strokeStyle='#2a2420'; g.lineWidth=1.5;
+      g.beginPath(); g.arc(ox+c*s+s/2,oy+r*s+s/2,s*.32,0,7); g.fill(); g.stroke(); }
+    g.fillStyle='#3a3028'; g.font='italic 15px Georgia, serif'; g.textAlign='center'; g.fillText('Diagram 12',W/2+6,oy+8*s+22);
+    y=lines(6,oy+8*s+44); lines(9,y+20); }
+  g.fillStyle='rgba(60,52,44,.6)'; g.font='13px Georgia, serif'; g.textAlign='center'; g.fillText(right?'43':'42',W/2+(right?6:-6),H-24);
+  for(let i=0;i<500;i++){ g.fillStyle=`rgba(140,110,70,${rnd(.02,.07)})`; g.fillRect(rnd(0,W),rnd(0,H),rnd(1,3),rnd(1,3)); }   // old paper speckles
+  const t=new T.CanvasTexture(cv); t.anisotropy=renderer.capabilities.getMaxAnisotropy(); return t;
+}
+function initBook(){
+  NO_SPRAY=true;
+  const Bk=new T.Group(), W=.66, H=.92, base=.026;
+  const prof=u=>base+.006+.05*Math.sin(Math.min(1,u*2.4)*Math.PI/2)-.022*u;                         // page surface rising from the spine
+  const leather='#7a2a3a', paper='#efe5cc';
+  const pageGeo=side=>{ const g=new T.PlaneGeometry(W,H,28,1); g.rotateX(-Math.PI/2); const P=g.attributes.position, U=g.attributes.uv;
+    for(let i=0;i<P.count;i++){ const x=P.getX(i)+W/2, u=x/W; P.setX(i,side*x); P.setY(i,prof(u)+.001); U.setX(i,side>0?u:1-u); }
+    P.needsUpdate=true; g.computeVertexNormals(); return g; };
+  const stackGeo=side=>{ const pts=[[0,base]]; for(let i=0;i<=24;i++){ const u=i/24; pts.push([u*W,prof(u)]); } pts.push([W,base]);
+    if(side<0) pts.reverse(); const sh=new T.Shape(); pts.forEach(([x,y],i)=>i?sh.lineTo(side*x,y):sh.moveTo(side*x,y)); sh.closePath();
+    const g=new T.ExtrudeGeometry(sh,{depth:H,bevelEnabled:false}); g.translate(0,0,-H/2); return g; };
+  const paperMat=new T.MeshToonMaterial({color:paper,gradientMap:GRAD,side:T.DoubleSide});
+  for(const side of [-1,1]){
+    const cover=addPart(Bk,Box(W+.03,base,H+.05),leather,side*(W/2+.012),base/2,0,{ow:.008});            // hard cover
+    const st=new T.Mesh(stackGeo(side),paperMat); st.castShadow=true; Bk.add(st);                           // block of pages
+    const pg=new T.Mesh(pageGeo(side),new T.MeshToonMaterial({map:bookPageTex(side>0),gradientMap:GRAD,side:T.DoubleSide})); Bk.add(pg); }
+  addPart(Bk,Cyl(.022,.022,H+.05,10),leather,0,.012,0,{rot:[Math.PI/2,0,0],ow:.006});                       // spine
+  // the page that lifts in the wind (pivots on the spine)
+  const flip=new T.Group(); Bk.add(flip);
+  const fp=new T.Mesh(pageGeo(1),new T.MeshToonMaterial({map:bookPageTex(true),gradientMap:GRAD,side:T.DoubleSide})); fp.position.y=.003; fp.castShadow=true; flip.add(fp);
+  // ribbon bookmark hanging out at the bottom
+  addPart(Bk,Box(.035,.004,.32),'#c8102e',.06,base+.02,H/2+.12,{rot:[.08,.12,0],outline:false});
+  // soft shadow under the book
+  { BLOB=BLOB||blobTex(); const sh=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({map:BLOB,transparent:true,opacity:.4,depthWrite:false}));
+    sh.rotation.x=-Math.PI/2; sh.scale.set(1.75,1.25,1); sh.position.y=.002; Bk.add(sh); }
+  Bk.position.set(BENCH.x-.45,FLOOR_Y+4.25+.002,BENCH.z+3.1); Bk.rotation.y=-Math.PI/2+.32; Bk.scale.setScalar(1.7); scene.add(Bk);
+  BOOK3D={Bk,flip,next:performance.now()+rnd(2500,5000),gust:-1e9,amp:0};
+  NO_SPRAY=false;
+}
+function updateBook(now){
+  const b=BOOK3D; if(!b) return;
+  if(now>b.next){ b.gust=now; b.amp=rnd(.35,1.1); b.next=now+rnd(4000,10000); }
+  const a=(now-b.gust)/1800; let r=0;
+  if(a<1){ const up=Math.min(1,a/.35), dn=Math.max(0,(a-.35)/.65); r=b.amp*(Math.sin(up*Math.PI/2)-dn*dn)*(1+.08*Math.sin(a*30)*(1-a)); }   // lifts quickly, flutters, settles back
+  b.flip.rotation.z=Math.max(0,r)+.004+Math.sin(now/700)*.003;
 }
 function updateSnails(now){
   for(const s2 of snails){
@@ -1512,7 +1574,11 @@ function updateSnails(now){
       s2.body.scale.set(1,1,1+pulse*.06);
       if(Math.abs(s2.off)>.6&&Math.sign(s2.off)===s2.head) s2.turn=3.5;
     }
-    s2.sn.position.copy(s2.base).addScaledVector(s2.dir,s2.off);
+    // stay on the pedestal: it is a cone (radius 1.9 at the top, 2.6 at the foot), so the surface leans inwards going up
+    const slope=.7/8, y=s2.y0+s2.off, rad=1.9+.7*(TY-TT-y)/8, up=new T.Vector3(0,1,0);
+    const nrm=s2.n.clone().addScaledVector(up,slope).normalize(), fwd=up.clone().addScaledVector(s2.n,-slope).normalize(), X=new T.Vector3().crossVectors(nrm,fwd);
+    s2.sn.position.set(s2.n.x*rad,y,s2.n.z*rad).addScaledVector(nrm,.02);
+    s2.sn.quaternion.setFromRotationMatrix(new T.Matrix4().makeBasis(X,nrm,fwd));
   }
 }
 // small First World War memorial on the lawn beside the table: stepped base, pedestal with a bronze plaque,
@@ -4419,7 +4485,7 @@ function loop(){
       u.capeSwing+=(target-u.capeSwing)*Math.min(1,dt*(target>u.capeSwing?8:2.5));
       cu.uSwing.value=u.capeSwing; cu.uTime.value=tm; }
   }
-  const nowB=performance.now(); updateBirds(nowB); updateSnails(nowB);
+  const nowB=performance.now(); updateBirds(nowB); updateSnails(nowB); updateBook(nowB);
   for(const G of meshes.values()){
     const u=G.userData; if(!u.eyes) continue;
     if(u.noBlink) continue;
@@ -4454,7 +4520,7 @@ let started=true, marching=false;
 try{ if(screen.orientation&&screen.orientation.lock) screen.orientation.lock('portrait').catch(()=>{}); }catch(e){}
 function fixStrayReview(){ if(mode()==='review'&&!REVIEW.active){ $('mode').value=PLAY_MODE==='review'?'cpu':PLAY_MODE; $('mode').onchange(); } }   // 'Review game' is never a starting mode
 window.addEventListener('pageshow',()=>setTimeout(fixStrayReview,0));
-applyLang(); initBackdrop(); initMemorial(); initBench(); initBirds(); initGarden(); applyBoardStyle(boardChoice()); $('clockSel').disabled=mode()!=='pvp'; restoreGame(); fixStrayReview(); setTopLabel(); Math.random=SYS_RANDOM; applyShadows(); loop();
+applyLang(); initBackdrop(); initMemorial(); initBench(); initBook(); initBirds(); initGarden(); applyBoardStyle(boardChoice()); $('clockSel').disabled=mode()!=='pvp'; restoreGame(); fixStrayReview(); setTopLabel(); Math.random=SYS_RANDOM; applyShadows(); loop();
 requestAnimationFrame(()=>requestAnimationFrame(()=>{ const ld=document.getElementById('loading'); if(ld) ld.remove(); }));
 })();
 </script>
