@@ -275,7 +275,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v270</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v271</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -3927,10 +3927,13 @@ function doResign(){
 function doOfferDraw(){
   if(!canAgree()) return;
   if(mode()==='pvp'){ $('drawMsg').textContent=L().drawOffered(colorName(TURN)); $('drawOv').hidden=false; return; }
-  // the computer accepts only when it is not ahead in material and the game has gone on a while
-  const cpu=opp(human()); let m=0; for(let i=0;i<64;i++){ const p=B[i]; if(p&&p.t!=='k') m+=(p.c===cpu?1:-1)*VAL[p.t]; }
-  if(m<=0&&history.length>=20){ RESULT_TAG='1/2-1/2'; endByAgreement(L().drawAgreed,'d','draw'); }
-  else { setStatus('<b>'+L().cpuDeclines+'</b>'); setTimeout(()=>{ if(!over) updateStatus(); },2200); }
+  // the computer accepts only after a while, and only if a short search of the position (threats and mates included) does not see it better off
+  if(history.length<20){ setStatus('<b>'+L().cpuDeclines+'</b>'); setTimeout(()=>{ if(!over) updateStatus(); },2200); return; }
+  const tok=gameToken; setStatus(L().search);
+  setTimeout(()=>{ if(tok!==gameToken||over||!canAgree()) return;
+    const cpu=opp(human()); think(450); const ev=TURN===cpu?LAST_SCORE:-LAST_SCORE;   // centipawns from the computer's side
+    if(ev<=30){ RESULT_TAG='1/2-1/2'; endByAgreement(L().drawAgreed,'d','draw'); }
+    else { setStatus('<b>'+L().cpuDeclines+'</b>'); setTimeout(()=>{ if(!over) updateStatus(); },2200); } },40);
 }
 function saveGame(){
   if(REVIEW.active||mode()==='review') return;   // reviewing never overwrites the saved game (not even in the instant the mode switches)
@@ -3989,7 +3992,7 @@ async function maybeAI(){
   const lv=$('level').value==='5'?ADAPT:+$('level').value;
   const r=await computeMove(lv,avoid,crit);
   if(tok!==gameToken||atok!==aiToken) return;
-  thinking=false;
+  thinking=false; if(over){ updateStatus(); return; }   // the game ended (resignation or agreed draw) while the computer was thinking
   if(r) CPU_LOG.push({k:key,mv:r.from*64+r.to,sc:r.score||0,ply:history.length});
   const m=r&&legalCache.find(x=>x.from===r.from&&x.to===r.to&&(x.promo||null)===(r.promo||null));
   if(m) performMove(m);

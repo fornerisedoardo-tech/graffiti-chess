@@ -1,5 +1,5 @@
 // Graffiti Chess — offline service worker
-const CACHE='gc-v270';
+const CACHE='gc-v271';
 const ASSETS=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png'];
 
 self.addEventListener('install',e=>{
