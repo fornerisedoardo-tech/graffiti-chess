@@ -1,7 +1,7 @@
 {
-  "name": "Graffiti Chess",
-  "short_name": "Graffiti Chess",
-  "description": "Scacchi 3D animati in stile graffiti, con combattimenti tra i pezzi.",
+  "name": "Graffiti Chess Plus",
+  "short_name": "Graffiti Chess Plus",
+  "description": "Scacchi e dama 3D animati in stile graffiti, con combattimenti tra i pezzi.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",
