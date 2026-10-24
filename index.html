@@ -285,7 +285,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v322</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v326</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -2206,10 +2206,12 @@ function makeChar(t,c){
   let capeU=null;
   const P=PAL[c], G=new T.Group(), rig=new T.Group(); G.add(rig);
   const S=1.25*{p:.85,n:1,b:1,r:1.1,q:1.05,k:1.12}[t]; rig.scale.setScalar(S);
-  const big=t==='r';
+  const big=t==='r', legsB=[];
   if(t!=='q'){
     const lx=big?.1:.06, lr=big?.07:.045;
     for(const s of [-1,1]){
+      if(t==='b'){ const pv=new T.Group(); pv.position.set(s*lx,.18,0); rig.add(pv); legsB.push({pv,s});   // hip pivot: the leg hangs from it and swings
+        addPart(pv,Cyl(lr,lr*1.1,.18,10),P.dark,0,-.09,0); addPart(pv,Sph(lr*1.3,10,8),P.dark,0,-.155,.02,{scale:[1,.6,1.4]}); continue; }
       addPart(rig,Cyl(lr,lr*1.1,.18,10),P.dark,s*lx,.09,0);
       addPart(rig,Sph(lr*1.3,10,8),P.dark,s*lx,.025,.02,{scale:[1,.6,1.4]});
     }
@@ -2470,9 +2472,10 @@ function makeChar(t,c){
   }
   G.userData={type:t,color:c,rig,armW,armO,hand,handL,S,phase:Math.random()*6.28,busy:false,eyes,xeyes,nextBlink:performance.now()+rnd(800,5000),blinkT:0};
   if(capeU){ G.userData.capeU=capeU; G.userData.capeSwing=0; G.userData.prevPos=null; }
+  if(legsB.length){ G.userData.legs=legsB; for(const l of legsB) mergeStatic(l.pv); }
   mergeStatic(hand); mergeStatic(handL); for(const pv of [armW,armO]) mergeStatic(pv,[hand,handL]);
   for(let i=0;i<eyes.length;i++){ mergeStatic(xeyes[i]); mergeStatic(eyes[i],[xeyes[i]]); }
-  mergeStatic(rig,[armW,armO,...eyes]);
+  mergeStatic(rig,[armW,armO,...eyes,...legsB.map(l=>l.pv)]);
   return G;
 }
 
@@ -3286,7 +3289,7 @@ function wordTex(text,c1,c2){ const key=text+c1; if(wordCache[key]) return wordC
 /* ---------- motion helpers ---------- */
 const ease={lin:t=>t,io:t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,in:t=>t*t*t,out:t=>1-Math.pow(1-t,3)};
 // SPEED scales every scripted animation, pause and timed sound together, so attack / guard / footstep timings stay in sync
-const SPEED=1.35;
+const SPEED=1.6;   // draughts runs at the pace of the chess animations (measured: a move, a capture, a promotion)
 function tween(ms,fn){ms/=SPEED; return new Promise(res=>{const s=performance.now(); (function step(){const t=Math.min(1,(performance.now()-s)/ms); fn(t); if(t<1) requestAnimationFrame(step); else res();})();});}
 const wait=ms=>new Promise(r=>setTimeout(r,ms/SPEED));
 const angleTo=(a,b)=>Math.atan2(b.x-a.x,b.z-a.z);
@@ -4110,7 +4113,7 @@ async function stepTo(G,target,o={}){
   u.busy=true;
   if(!o.noTurn) await Promise.all([turnTo(G,angleTo(from,target),200),shieldTo(u,true)]); else await shieldTo(u,true);
   // one half-cycle per step: the legs swing in opposition, each footfall (leg at full stride) is heard, the free arm swings against the legs
-  const steps=Math.max(2,Math.round(d*2.9)), dur=Math.max(520,d*820), r=restPose(u), A=u.legSwing??.5;   // short steps under a long skirt
+  const steps=Math.max(2,Math.round(d*2.5)), dur=Math.max(450,d*670), r=restPose(u), A=u.legSwing??.5;   // short steps under a long skirt
   // footfalls at 1/steps, 2/steps ... 1: the legs reach full stride on each of them, and the last one is the arrival (feet together)
   for(let k=1;k<=steps;k++) DSFX.playIn('step',dur*k/steps);
   await tween(dur,t=>{ const ph=t*Math.PI*steps-Math.PI*.5, sn=Math.sin(ph), env=Math.max(0,Math.min(1,t*steps*2,(1-t)*steps*2));
@@ -4748,6 +4751,7 @@ function letterTex(ch,c){ const key=ch+c; if(LETTER_TEX[key]) return LETTER_TEX[
   g.fillStyle=gr; g.fillText(ch,N/2,y);
   const t=new T.CanvasTexture(cv); t.anisotropy=renderer.capabilities.getMaxAnisotropy(); return LETTER_TEX[key]=t; }
 const DISC_H=.125;
+const CL_T=1.6/1.35;   // the discs keep the pace they had (already that of the chess pieces) when the draughts heroes were sped up
 let DISC_GEO=null;
 function discGeo(){ if(DISC_GEO) return DISC_GEO;
   const pts=[[0,0],[.3,0],[.322,.012],[.33,.035],[.33,.09],[.322,.113],[.3,DISC_H],[.25,DISC_H],[.24,DISC_H-.012],[.205,DISC_H-.012],[.195,DISC_H],[0,DISC_H]]   // a shallow groove on the top
@@ -4777,12 +4781,12 @@ function buildPiles(taken){ clearPiles();   // taken: for each side, the pieces 
   for(const by of ['w','b']) taken[by].forEach((x,i)=>{ const G=makeDisc('p',x.c,x.l); G.position.copy(pilePos(by,i)); G.rotation.y=(x.c==='w'?0:Math.PI)+rnd(-.5,.5); scene.add(G); addToPile(G,by); }); }
 // moves
 async function slideDisc(G,to,ms=300,hop=.06){ const p0=G.position.clone(), d=p0.distanceTo(to); ms=Math.max(ms,d*190);
-  await tween(ms,t=>{ const e=ease.io(t); G.position.lerpVectors(p0,to,e); G.position.y=p0.y+(to.y-p0.y)*e+Math.sin(Math.PI*t)*hop; });
+  await tween(ms*CL_T,t=>{ const e=ease.io(t); G.position.lerpVectors(p0,to,e); G.position.y=p0.y+(to.y-p0.y)*e+Math.sin(Math.PI*t)*hop; });
   G.position.copy(to); DSFX.play('land'); }
 async function takeDisc(V,by){   // the captured disc lifts and goes to the capturer's pile
   const i=pileCount(by), to=pilePos(by,i); sparkle(V.position.clone().setY(.2),'#ffffff',6,.4,{size:.1,star:true});
   const top=V.userData.rig.children[1]; if(top) top.visible=false;   // a king loses its crown disc: one disc per piece in the pile
-  const p0=V.position.clone(); await tween(420,t=>{ const e=ease.io(t); V.position.lerpVectors(p0,to,e); V.position.y=p0.y+(to.y-p0.y)*e+Math.sin(Math.PI*t)*.9; V.rotation.y+=.08; });
+  const p0=V.position.clone(); await tween(420*CL_T,t=>{ const e=ease.io(t); V.position.lerpVectors(p0,to,e); V.position.y=p0.y+(to.y-p0.y)*e+Math.sin(Math.PI*t)*.9; V.rotation.y+=.08; });
   V.position.copy(to); DSFX.play('land'); addToPile(V,by);
 }
 async function classicMove(m,A,victims,squares){   // victims[i] is jumped on the way to squares[i]
@@ -4793,7 +4797,7 @@ async function classicMove(m,A,victims,squares){   // victims[i] is jumped on th
   return A; }
 async function crownDisc(A){   // a second disc drops onto the man
   const u=A.userData, c=u.color, top=new T.Group(); addDisc(top,c,0,{letter:u.letter,king:true}); top.rotation.y=A.rotation.y; top.position.set(A.position.x,1.6,A.position.z); scene.add(top);
-  DSFX.play('rise'); await tween(520,t=>{ top.position.y=1.6-(1.6-DISC_H)*ease.in(t); });
+  DSFX.play('rise'); await tween(520*CL_T,t=>{ top.position.y=1.6-(1.6-DISC_H)*ease.in(t); });
   DSFX.play('land'); sparkle(A.position.clone().setY(.3),'#ffe28a',14,.7,{size:.14,star:true}); scene.remove(top); disposeTree(top);
   const K=makeDisc('d',c,u.letter); K.position.copy(A.position); return K; }
 
@@ -5349,7 +5353,7 @@ function turnTo(G,a,ms=170){
   return tween(ms,t=>{G.rotation.y=s+d*ease.io(t);});
 }
 function rigScale(u){ if(u.symbol) u.rig.scale.setScalar(1); else if(u.classic) u.rig.scale.set(1.28,1.6,1.28); else u.rig.scale.setScalar(u.S); }   // classic sets: larger, but slim rather than squat
-function resetRig(G){const u=G.userData; if(u.fantasy){ FANTASY.reset(G); return; } u.rig.position.set(0,0,0); u.rig.rotation.set(0,0,0); rigScale(u); u.armW.rotation.set(0,0,0); u.armO.rotation.set(0,0,0); u.hand.rotation.set(0,0,0); if(u.handL) u.handL.rotation.set(0,0,0);
+function resetRig(G){const u=G.userData; if(u.fantasy){ FANTASY.reset(G); return; } if(u.legs) for(const l of u.legs) l.pv.rotation.set(0,0,0); u.rig.position.set(0,0,0); u.rig.rotation.set(0,0,0); rigScale(u); u.armW.rotation.set(0,0,0); u.armO.rotation.set(0,0,0); u.hand.rotation.set(0,0,0); if(u.handL) u.handL.rotation.set(0,0,0);
   if('pnk'.includes(u.type)){ u.armW.rotation.x=-.5; u.hand.rotation.x=1.285; }   // weapon held at 45°, pointing up and forward
   if(u.type==='q'){ u.armW.rotation.x=-.5; u.hand.rotation.x=1.024; }            // sceptre held higher, at 60° above the ground
   if(u.type==='b'){ u.armW.rotation.x=-.5; u.hand.rotation.x=1.0; }   // sabre raised in salute
@@ -5378,6 +5382,8 @@ async function walk(G,target){
       u.rig.rotation.z=Math.sin(ph)*(heavy?.12:(bsh?.012:.06)); if(bsh) u.rig.rotation.x=.06;
       if('pnkq'.includes(u.type)){ u.armW.rotation.x=-.5+Math.sin(ph)*.1; u.hand.rotation.x=u.type==='q'?1.024:1.285; } else if(u.type==='b'){ u.armW.rotation.x=-.5+Math.sin(ph)*.1; u.hand.rotation.x=1.0; } else u.armW.rotation.x=Math.sin(ph)*.5;
       u.armO.rotation.x=-Math.sin(ph)*.5;
+      if(u.legs){ const env=Math.max(0,Math.min(1,t*steps*2,(1-t)*steps*2)), sw=-Math.cos(ph)*.5*env;   // full stride at every footfall (k/steps, with the sound), feet together at the start and on arrival
+        for(const l of u.legs) l.pv.rotation.x=l.s*sw; u.armO.rotation.x=Math.cos(ph)*.35*env; }
     });
   }
   resetRig(G);
@@ -5541,7 +5547,7 @@ const SFX=(()=>{
     playIn(n,ms){
       if(!S[n]) return;
       const c=ensure(), target=performance.now()+ms;
-      const fire=delay=>{ try{ baseAt=Math.max(0,delay/1000-latency()); S[n](); }catch(e){} finally{ baseAt=0; } };
+      const fire=delay=>{ try{ baseAt=Math.max(0,delay/1000-Math.max(0,latency()-.035)); S[n](); }catch(e){} finally{ baseAt=0; } };
       // the audio clock does not run while the context is still waking up (first move after loading):
       // wait for it, then schedule against the remaining wall-clock time so the sound is not late
       if(c&&c.state!=='running') c.resume().then(()=>{ const rem=target-performance.now(); if(rem>-40) fire(Math.max(0,rem)); }).catch(()=>{});
@@ -6602,9 +6608,9 @@ function revReserve(){ if(REV_RES!==null) return REV_RES; const rb=$('reviewBar'
   const ar=app.getBoundingClientRect(), tb=$('toolbar'), gap=tb.offsetHeight?ar.bottom-tb.getBoundingClientRect().bottom:8; if(!was) body.classList.add('reviewing'); rb.hidden=false; rb.style.visibility='hidden'; REV_RES=rb.offsetHeight?rb.offsetHeight+gap:0;   // its height, at the toolbar's distance from the bottom; measured in the same frame: never painted
   rb.hidden=hid; rb.style.visibility=vis; if(!was) body.classList.remove('reviewing'); return REV_RES; }
 window.addEventListener('resize',()=>{ REV_RES=null; });
-// chess: the board is framed for the taller of the two bottom bars, so it stays exactly in place between the game and the review
+// the board is framed for the taller of the two bottom bars, so it stays exactly in place between the game, the review and draughts
 function bottomBarsH(){ const ar=app.getBoundingClientRect(); let b=0; for(const id of ['toolbar','reviewBar']){ const e=$(id); if(!e||e.hidden||!e.offsetHeight||getComputedStyle(e).display==='none') continue; b=Math.max(b,ar.bottom-e.getBoundingClientRect().top); }
-  if(!DAMA.active){ try{ b=Math.max(b,revReserve()); }catch(e){} } return b; }
+  try{ b=Math.max(b,revReserve()); }catch(e){} return b; }   // the same in draughts, so switching game does not move the board
 window.addEventListener('resize',()=>{ resize(); fitMenuHeight(); }); resize();
 if(window.ResizeObserver){ let rq=0; const ro=new ResizeObserver(()=>{ if(rq) return; rq=requestAnimationFrame(()=>{ rq=0; layoutCamera(); }); }); for(const id of ['status','toolbar','reviewBar','menuBtn']){ const e=$(id); if(e) ro.observe(e); } }
 document.addEventListener('contextmenu',e=>{ if(!e.target.closest('select')) e.preventDefault(); });
