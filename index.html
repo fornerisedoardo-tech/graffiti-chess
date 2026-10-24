@@ -285,7 +285,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v326</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v327</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -4770,10 +4770,11 @@ function makeDisc(t,c,letter){
   const u={type:t,color:c,rig,classic:true,busy:false,eyes:[],sway:[],glows:[],S:1,letter};
   addDisc(rig,c,0,{letter}); if(t==='d') addDisc(rig,c,DISC_H,{letter,king:true});   // a king: a second disc on top, the same letter
   G.userData=u; return G; }
-// the piles of captured pieces: White's catches on the right of the board, Black's on the left, two stacks each
+// the piles of captured pieces: on the table (not floating at board height), in front of the player who took them, on his right:
+// White's catches near White's edge, Black's near Black's edge, two stacks of six each, clear of the braziers and of the board
 const PILES=[];
 function pilePos(byColour,i){ const sx=byColour==='w'?1:-1, col=Math.floor(i/6), k=i%6;
-  return new T.Vector3(sx*(BW/2+.48),.0+k*DISC_H,(col?-.42:.42)*sx); }
+  return new T.Vector3(sx*(2.95+col*.78),TY+k*DISC_H,sx*(BW/2+.62)); }
 function clearPiles(){ for(const G of PILES){ scene.remove(G); disposeTree(G); } PILES.length=0; }
 function pileCount(by){ return PILES.filter(G=>G.userData.by===by).length; }
 function addToPile(G,by){ G.userData.by=by; PILES.push(G); }
