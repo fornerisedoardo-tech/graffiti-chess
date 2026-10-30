@@ -1,7 +1,7 @@
 {
   "name": "Graffiti Chess Plus",
   "short_name": "Graffiti Chess Plus",
-  "description": "Scacchi e dama 3D animati in stile graffiti, con combattimenti tra i pezzi.",
+  "description": "Scacchi, dama italiana, dama brasiliana e Reversi in 3D, in stile graffiti, con combattimenti animati tra i pezzi.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",
