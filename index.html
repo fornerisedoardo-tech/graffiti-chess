@@ -286,7 +286,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v352</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v353</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -6703,10 +6703,13 @@ syncFakeSelects();
 $('expBtn').onclick=e=>{ e.stopPropagation(); exportData(); };
 $('impBtn').onclick=e=>{ e.stopPropagation(); $('impFile').value=''; $('impFile').click(); };
 $('impFile').onchange=()=>{ const f=$('impFile').files[0]; if(f) importData(f); };
-const RESET_TXT={it:'Tocca di nuovo per azzerare',en:'Tap again to reset',fr:'Touche encore pour effacer',de:'Zum Zurücksetzen erneut tippen',es:'Toca otra vez para borrar',pt:'Toque de novo para apagar',pl:'Dotknij ponownie, aby wyzerować',ru:'Нажмите ещё раз для сброса',tr:'Sıfırlamak için tekrar dokun',id:'Ketuk lagi untuk mengatur ulang'};
-function armReset(b){ if(b.dataset.armed==='1'){ b.dataset.armed=''; clearTimeout(b._t); b.textContent=b.dataset.lbl; b.classList.remove('armed'); return true; }
-  b.dataset.lbl=b.textContent; b.dataset.armed='1'; b.textContent=RESET_TXT[LANG]||RESET_TXT.en; b.classList.add('armed');
-  b._t=setTimeout(()=>{ b.dataset.armed=''; b.textContent=b.dataset.lbl; b.classList.remove('armed'); },3000); return false; }
+const RESET_TXT={it:'Tocca ancora',en:'Tap again',fr:'Touche encore',de:'Nochmal tippen',es:'Toca otra vez',pt:'Toque de novo',pl:'Dotknij ponownie',ru:'Ещё раз',tr:'Tekrar dokun',id:'Ketuk lagi'};
+const RESET_DONE={it:'Azzerato',en:'Cleared',fr:'Effacé',de:'Gelöscht',es:'Borrado',pt:'Zerado',pl:'Wyzerowano',ru:'Сброшено',tr:'Sıfırlandı',id:'Direset'};
+function armReset(b){ if(b.dataset.done==='1') return false;   /* v353: while it shows "Azzerato" a tap does nothing */
+  if(b.dataset.armed==='1'){ b.dataset.armed=''; clearTimeout(b._t); b.classList.remove('armed'); b.dataset.done='1'; b.textContent=RESET_DONE[LANG]||RESET_DONE.en;
+    b._t=setTimeout(()=>{ b.dataset.done=''; b.textContent=(L().reset||b.dataset.lbl); b.style.minWidth=''; },2000); return true; }
+  b.dataset.lbl=b.textContent; b.style.minWidth=b.offsetWidth+'px'; b.dataset.armed='1'; b.textContent=RESET_TXT[LANG]||RESET_TXT.en; b.classList.add('armed');
+  b._t=setTimeout(()=>{ b.dataset.armed=''; b.textContent=(L().reset||b.dataset.lbl); b.style.minWidth=''; b.classList.remove('armed'); },3000); return false; }
 $('statsReset').onclick=e=>{ e.stopPropagation(); if(!armReset(e.currentTarget)) return; if(DAMA.active){ DAMA.resetStats(); return; } STATS={}; ADAPT=2; ADAPT_SH=false; LEARN={v:2,bad:{},crit:{},order:[]}; try{ localStorage.removeItem('gc-stats'); }catch(err){} saveLearn(); renderStats(); };   // resets statistics, adaptive level and what the computer learned
 (function groupMenu(){   // functional settings first, appearance second
   const mp=$('menuPanel'), lab=id=>$(id).closest('label'), anchor=$('statsBtn').closest('.row2');
