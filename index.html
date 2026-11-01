@@ -286,7 +286,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v353</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v354</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -5041,7 +5041,7 @@ const RV=(()=>{
   function lvRow(){ let r=document.getElementById('rvLevel');
     if(!r){ r=document.createElement('div'); r.id='rvLevel'; r.innerHTML='<span></span><b></b>'; const l=$('level').closest('label'); l.parentNode.insertBefore(r,l.nextSibling); }
     const show=on&&vsCpu(); r.style.display=show?'flex':'none'; if(!show) return;
-    const t=L(), f=Math.floor(LVL), v=LVL>=4?t.lv[3]:(LVL===f?t.lv[f-1]:t.lv[f-1]+'–'+t.lv[f]);
+    const t=L(), f=Math.floor(LVL), ab=x=>Array.from(x).slice(0,2).join(''), v=LVL>=4?t.lv[3]:(LVL===f?t.lv[f-1]:ab(t.lv[f-1])+'-'+ab(t.lv[f]));   /* v354: in-between levels abbreviated, e.g. Fa-Me (Edoardo) */
     r.firstChild.textContent=t.diff; r.lastChild.textContent=t.adaptive+' · '+v; }
   function menuVis(){ const c=vsCpu(), off={boardSel:1,openSel:1,level:1,clockSel:1,pieceSel:1,threatSel:1,side:!c,flipSel:1};
     document.querySelectorAll('#menuPanel label').forEach(l=>{ const s=l.querySelector('select'); l.style.display=s&&off[s.id]?'none':''; });
