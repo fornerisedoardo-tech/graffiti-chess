@@ -286,7 +286,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v355</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v356</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -4818,6 +4818,25 @@ function letterTex(ch,c){ const key=ch+c; if(LETTER_TEX[key]) return LETTER_TEX[
   g.lineJoin='round'; g.strokeStyle=c==='w'?'rgba(84,52,10,.8)':'rgba(30,8,4,.6)'; g.lineWidth=6; g.strokeText(ch,N/2,y);   // a hair of shadow, so the gold reads on ivory as on lacquer
   g.fillStyle=gr; g.fillText(ch,N/2,y);
   const t=new T.CanvasTexture(cv); t.anisotropy=renderer.capabilities.getMaxAnisotropy(); return LETTER_TEX[key]=t; }
+// v356: a gold laurel wreath for the kings, drawn once per colour: two branches of leaves round the centre, joined by a small bow at the bottom
+const LAUREL_TEX={};
+function laurelTex(c){ if(LAUREL_TEX[c]) return LAUREL_TEX[c];
+  const N=512, [cv,g]=canvas(N,N); g.clearRect(0,0,N,N); const cx=N/2, cy=N/2, R=N*.36;
+  const gr=g.createLinearGradient(0,N*.1,0,N*.9); gr.addColorStop(0,'#ffe07a'); gr.addColorStop(.5,'#e0a52c'); gr.addColorStop(1,'#a8701a');
+  const edge=c==='w'?'rgba(84,52,10,.95)':'rgba(30,8,4,.85)';
+  g.lineCap='round'; g.lineJoin='round';
+  const leaf=(x,y,th,len,wid)=>{ g.save(); g.translate(x,y); g.rotate(th); g.beginPath(); g.moveTo(0,0); g.quadraticCurveTo(wid,-len*.5,0,-len); g.quadraticCurveTo(-wid,-len*.5,0,0);
+    g.fillStyle=gr; g.fill(); g.lineWidth=5; g.strokeStyle=edge; g.stroke(); g.beginPath(); g.moveTo(0,-2); g.lineTo(0,-len*.8); g.lineWidth=1.6; g.stroke(); g.restore(); };
+  for(const side of [1,-1]){   // right branch: from the bottom up the right side (angle decreasing); left branch: up the left side
+    const a0=Math.PI/2-side*.2, span=Math.PI-.55, n=9;
+    g.beginPath(); if(side>0) g.arc(cx,cy,R,a0-span,a0); else g.arc(cx,cy,R,a0,a0+span);
+    g.lineWidth=9; g.strokeStyle=edge; g.stroke(); g.lineWidth=5; g.strokeStyle='#d9a441'; g.stroke();
+    for(let k=0;k<n;k++){ const t=(k+.6)/n, ang=a0-side*t*span, x=cx+Math.cos(ang)*R, y=cy+Math.sin(ang)*R;
+      const vx=side>0?Math.sin(ang):-Math.sin(ang), vy=side>0?-Math.cos(ang):Math.cos(ang), th=Math.atan2(vx,-vy), L=46-k*2.2;
+      leaf(x,y,th-.62,L*1.12,19); leaf(x,y,th+.62,L*1.12,19); }
+    const ae=a0-side*span; leaf(cx+Math.cos(ae)*R,cy+Math.sin(ae)*R,Math.atan2(side>0?Math.sin(ae):-Math.sin(ae),side>0?Math.cos(ae):-Math.cos(ae)),34,13); }   // a leaf at the tip
+  g.beginPath(); g.ellipse(cx,cy+R+2,15,11,0,0,Math.PI*2); g.fillStyle=gr; g.fill(); g.lineWidth=3.5; g.strokeStyle=edge; g.stroke();   // the knot at the bottom
+  const t=new T.CanvasTexture(cv); t.anisotropy=renderer.capabilities.getMaxAnisotropy(); return LAUREL_TEX[c]=t; }
 const DISC_H=.125;
 const CL_T=1.6/1.35;   // the discs keep the pace they had (already that of the chess pieces) when the draughts heroes were sped up
 let DISC_GEO=null;
@@ -4831,7 +4850,8 @@ function addDisc(g,c,y,o={}){ const P=DISC[c], d=new T.Group(); d.position.y=y; 
   addPart(d,new T.CylinderGeometry(.16,.16,.002,32),P.inlay,0,DISC_H+.001,0,{outline:false});               // the inlaid centre
   if(o.letter){ const m=new T.Mesh(new T.PlaneGeometry(.27,.27),new T.MeshToonMaterial({map:letterTex(o.letter,c),gradientMap:GRAD,transparent:true,depthWrite:false}));
     m.rotation.x=-Math.PI/2; m.position.y=DISC_H+.0035; m.renderOrder=1; d.add(m); }               // upright for the piece's own player
-  if(o.king) addPart(d,new T.TorusGeometry(.175,.005,6,48),P.band,0,DISC_H+.003,0,{rot:[Math.PI/2,0,0],outline:false});   // a king: a thin gold circle round the letter
+  if(o.king){ const w=new T.Mesh(new T.PlaneGeometry(.6,.6),new T.MeshToonMaterial({map:laurelTex(c),gradientMap:GRAD,transparent:true,depthWrite:false}));
+    w.rotation.x=-Math.PI/2; w.position.y=DISC_H+.003; w.renderOrder=1; d.add(w); }   // v356 (Edoardo): a king: a small gold laurel wreath round the centre, instead of the thin gold circle
   return d; }
 function makeDisc(t,c,letter){
   const G=new T.Group(), rig=new T.Group(); G.add(rig);
