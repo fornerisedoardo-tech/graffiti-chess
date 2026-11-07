@@ -50,7 +50,7 @@ body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:Rubi
 #hud{position:absolute;inset:0 0 auto 0;display:flex;align-items:flex-start;padding:12px;pointer-events:none}
 .brandbtn{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink)}
 .brandbtn h1{margin:0}
-.chev{font-size:16px;color:var(--muted);transition:transform .2s}
+.chev{font-size:24px;line-height:1;margin:-1px 0;color:var(--muted);transition:transform .2s}
 .brandbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .menu{display:flex;flex-direction:column;gap:5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);min-width:200px}
 .menu[hidden]{display:none}
@@ -288,7 +288,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v374</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v375</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
