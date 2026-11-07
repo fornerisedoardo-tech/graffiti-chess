@@ -288,7 +288,7 @@ body.exploring #toolbar button:not(#exploreBtn):not(#muteBtn), body.exploring #h
 <div id="statsBox"><div class="sh"><span id="statsTitle">Statistics</span><button id="statsReset">Reset</button></div><div id="statsTbl"></div><div class="row2" id="statsIO"><button id="expBtn">Export</button><button id="impBtn">Import</button></div><input type="file" id="impFile" accept=".json,application/json" hidden></div>
 <div class="ovBtns"><button id="statsBack">‹ Back</button><button class="primary" id="statsClose">Close</button></div></div></div>
   <div id="pickOv" hidden><div class="card" id="pickCard"><div class="ph" id="pickTitle"></div><div id="pickList"></div></div></div>
-  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v370</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
+  <div id="infoOv" hidden><div class="card"><div class="ih" id="infoTitle">How to play</div><ul id="infoList"></ul><div id="appVer">gc-v371</div><div class="ovBtns"><button id="infoBack">‹ Back</button><button class="primary" id="infoClose">Close</button></div></div></div>
   <div id="drawOv" hidden><div class="card"><div class="msg" id="drawMsg"></div><div class="row2"><button class="primary" id="drawYes">Accept</button><button id="drawNo">Decline</button></div></div></div>
   <div id="pauseOv" hidden><div class="card"><div class="big">Paused</div><button class="primary" id="resumeBtn">▶ Resume</button></div></div>
   <div id="rotateMsg"><div class="card"><div class="ico">📱↻</div><span class="txt">Turn your phone upright to play</span></div></div>
@@ -5193,7 +5193,7 @@ function studySet(i,keep){
   STUDY.idx=Math.max(0,Math.min(STUDY.moves.length,i));
   kFace.clear(); Bd=RU.start(); turn='w'; hist=[]; done=false; endTxt=null; RESIGNED=null; ENDK=null; COUNT=null; lastM=null;
   for(let k=0;k<STUDY.idx;k++){ const m=STUDY.moves[k]; hist.push({B:Bd,turn,m}); Bd=RU.apply(Bd,m); turn=turn==='w'?'b':'w'; lastM={from:m.from,to:m.to}; }
-  legal=[]; if(keep){ LS=letterState(); syncCheck(); } else syncD(); showDLast(); studyStatus(); }
+  legal=[]; if(keep){ LS=letterState(); syncCheck(); } else syncD(); showDLast(); showMust(); clearDMarks(); studyStatus(); }   // v371: no yellow squares or selection of the game left on the board
 async function studyGo(i){
   if(!STUDY.on) return; STUDY.msg=''; i=Math.max(0,Math.min(STUDY.moves.length,i));
   if(STUDY.busy){ tokenD++; STUDY.busy=false; studySet(i); return; }   // a tap during the animation: stop it and show the position asked for
